@@ -59,7 +59,7 @@ module.exports = {
 						imageUrl: user.imageUrl,
 					},
 					JWT_SECRET,
-					{ expiresIn: "1h" }
+					{ expiresIn: 6 }
 				);
 
 				return {
