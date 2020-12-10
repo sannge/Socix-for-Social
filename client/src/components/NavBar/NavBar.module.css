@@ -1,0 +1,47 @@
+.NavBar {
+	position: fixed;
+	top: 0;
+	height: 80px;
+	width: 100%;
+	background: white;
+	display: flex;
+	align-items: center;
+}
+
+.NavBarContainer {
+	max-width: 1360px;
+	width: 90%;
+	margin: auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.Logo {
+	width: 200px;
+}
+.Logo > img {
+	width: 100%;
+}
+.Menu {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.Menu button {
+	background: none;
+	border: none;
+	margin: 0 20px;
+	cursor: pointer;
+}
+
+.Menu button:focus {
+	outline: none;
+}
+
+.Link {
+	text-decoration: none;
+	color: black;
+	margin: 0 20px;
+	font-size: 0.88rem;
+}
