@@ -44,10 +44,6 @@ function Login({ history }) {
 		loginUser({ variables });
 	};
 
-	if (localStorage.getItem("token")) {
-		return <Redirect to='/' />;
-	}
-
 	return (
 		<div>
 			<form className={classes.form}>

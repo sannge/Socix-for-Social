@@ -9,7 +9,7 @@ let user = null;
 if (token) {
 	const decodedToken = jwtDecode(token);
 	const expiresAt = new Date(decodedToken.exp * 1000);
-
+	console.log(new Date(expiresAt) - new Date());
 	if (new Date() > expiresAt) {
 		localStorage.removeItem("token");
 	} else {

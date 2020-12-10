@@ -43,7 +43,6 @@ function Register(props) {
 			props.history.push("/login");
 		},
 		onError: (err) => {
-			console.log(err.graphQLErrors[0].extensions.errors);
 			setErrors(err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors);
 		},
 	});
@@ -52,9 +51,7 @@ function Register(props) {
 		e.preventDefault();
 		registerUser({ variables });
 	};
-	if (localStorage.getItem("token")) {
-		return <Redirect to='/' />;
-	}
+
 	return (
 		<div className={classes.register}>
 			<form className={classes.form}>

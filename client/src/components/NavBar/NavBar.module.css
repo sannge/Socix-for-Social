@@ -15,11 +15,14 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	margin-bottom: 0;
 }
 .Logo {
+	flex-grow: 0;
+	flex-shrink: 0;
 	width: 200px;
 }
-.Logo > img {
+.Logo img {
 	width: 100%;
 }
 .Menu {
@@ -28,11 +31,23 @@
 	align-items: center;
 }
 
+.eachMenu {
+	padding: 0 5px;
+	display: flex;
+	align-items: center;
+}
+
+.underLined {
+	border-bottom: 4px solid rgb(0, 130, 255);
+	/* color: rgb(0, 130, 255) !important; */
+}
+
 .Menu button {
 	background: none;
 	border: none;
 	margin: 0 20px;
 	cursor: pointer;
+	padding: 10px 3px 2px 3px;
 }
 
 .Menu button:focus {
@@ -44,4 +59,54 @@
 	color: black;
 	margin: 0 20px;
 	font-size: 0.88rem;
+	padding: 10px 3px 2px 3px;
+}
+
+@media screen and (max-width: 767px) {
+	.Menu {
+		position: absolute;
+		right: 6%;
+		top: 55px;
+		background: white;
+		text-align: center;
+		padding: 10px;
+		flex-flow: column;
+		box-shadow: 0 0 3px #ccc;
+	}
+
+	.Menu button,
+	.Menu .Link {
+		background: transparent;
+		border-bottom: none;
+		border-radius: 0px;
+		width: 100%;
+		padding: 10px 0;
+		transition: all 0.3s ease-in-out;
+	}
+
+	.eachMenu {
+		width: 100%;
+		justify-content: start;
+		align-items: center;
+	}
+
+	.Menu button {
+		border: none;
+	}
+
+	.toggler:hover {
+		cursor: pointer;
+	}
+
+	.Menu button:hover,
+	.Menu .Link:hover {
+		color: #f2f2f2;
+		background: rgb(0, 130, 255) !important;
+	}
+
+	.underLined {
+		transform: scale(1);
+		/* color: rgb(0, 130, 255) !important; */
+		font-weight: 100;
+	}
 }
