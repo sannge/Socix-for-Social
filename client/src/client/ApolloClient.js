@@ -3,7 +3,6 @@ import {
 	InMemoryCache,
 	ApolloProvider as Provider,
 	HttpLink,
-	concat,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
@@ -35,12 +34,13 @@ export default function ApolloProvider(props) {
 			dispatch({ type: "LOGOUT" });
 		}
 	});
-
+	const linkWithHeader = authLink.concat(httpLink);
 	const client = new ApolloClient({
 		//this is very very very important to write this way
 		//concat errorLink different way then concating with concat()
 		//it will occur error
-		link: errorLink.concat(concat(authLink, httpLink)),
+
+		link: errorLink.concat(linkWithHeader),
 		cache: new InMemoryCache(),
 	});
 	//not adding the logout on networkError 401 because
