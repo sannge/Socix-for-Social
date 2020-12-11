@@ -1,4 +1,4 @@
-const { User } = require("../../models");
+const { Message, User } = require("../../models");
 const bcrypt = require("bcryptjs");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const jwt = require("jsonwebtoken");
@@ -10,12 +10,42 @@ module.exports = {
 		getUsers: async (_, __, { user }) => {
 			try {
 				if (!user) throw new AuthenticationError("Unauthenticated");
-				const users = await User.findAll({
+				let users = await User.findAll({
+					attributes: ["username", "imageUrl", "createdAt"],
 					where: {
 						email: {
 							[Op.ne]: user.email,
 						},
 					},
+				});
+
+				const userObject = await User.findOne({
+					where: {
+						email: user.email,
+					},
+				});
+
+				//find all the messages in descedning time, meaning latest first,
+				//where current user send to or receive from
+				const allUserMessages = await Message.findAll({
+					where: {
+						[Op.or]: [
+							{ from: userObject.username },
+							{ to: userObject.username },
+						],
+					},
+					order: [["createdAt", "DESC"]],
+				});
+
+				//this point, first message will be latest because of 'DESC',
+				//add message to each user, and then return
+				users = users.map((otherUser) => {
+					const latestMessage = allUserMessages.find(
+						(m) => m.from === otherUser.username || m.to === otherUser.username
+					);
+					otherUser.latestMessage = latestMessage;
+					console.log(latestMessage);
+					return otherUser;
 				});
 				return users;
 			} catch (err) {

@@ -1,11 +1,14 @@
 const { gql } = require("apollo-server");
 
+//omit emails from getUsers resolver
 module.exports = gql`
 	type User {
 		username: String!
-		email: String!
+		email: String
 		createdAt: String!
 		token: String
+		latestMessage: Message
+		imageUrl: String
 	}
 
 	type Message {
