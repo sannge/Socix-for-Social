@@ -27,5 +27,8 @@ export default function ApolloProvider(props) {
 		link: authLink.concat(httpLink),
 		cache: new InMemoryCache(),
 	});
+	//not adding the logout on networkError 401 because 
+	//it is not stable. Trying to apply refreshing token method
+	//into the project
 	return <Provider client={client} {...props} />;
 }
