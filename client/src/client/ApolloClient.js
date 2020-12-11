@@ -3,6 +3,7 @@ import {
 	InMemoryCache,
 	ApolloProvider as Provider,
 	HttpLink,
+	concat,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
@@ -26,14 +27,20 @@ export default function ApolloProvider(props) {
 	});
 
 	const errorLink = onError(({ graphQLErrors, networkError }) => {
-		console.log(graphQLErrors && graphQLErrors[0] && graphQLErrors[0].message);
-		if (graphQLErrors?.[0]?.message === "Unauthenticated") {
+		if (
+			graphQLErrors &&
+			graphQLErrors[0] &&
+			graphQLErrors[0].message === "Unauthenticated"
+		) {
 			dispatch({ type: "LOGOUT" });
 		}
 	});
 
 	const client = new ApolloClient({
-		link: authLink.concat(httpLink),
+		//this is very very very important to write this way
+		//concat errorLink different way then concating with concat()
+		//it will occur error
+		link: errorLink.concat(concat(authLink, httpLink)),
 		cache: new InMemoryCache(),
 	});
 	//not adding the logout on networkError 401 because

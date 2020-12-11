@@ -29,9 +29,14 @@ function Login({ history }) {
 
 	const dispatch = useAuthDispatch();
 
-	const [loginUser, { loading }] = useLazyQuery(LOGIN_USER, {
+	const [loginUser, { loading, error }] = useLazyQuery(LOGIN_USER, {
 		onError: (err) => {
-			setErrors(err.graphQLErrors[0].extensions.errors);
+			setErrors(
+				err.graphQLErrors &&
+					err.graphQLErrors[0] &&
+					err.graphQLErrors[0].extensions &&
+					err.graphQLErrors[0].extensions.errors
+			);
 		},
 		onCompleted: (data) => {
 			dispatch({ type: "LOGIN", payload: data.login });

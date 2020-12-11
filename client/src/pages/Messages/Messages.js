@@ -7,6 +7,11 @@ function Messages() {
 	const { data, loading, error } = useQuery(GET_USERS);
 
 	if (error) {
+		// console.log(error);
+		// console.log(
+		// 	"HIHIHI:",
+		// 	error.graphQLErrors[0].message === "Unauthenticated"
+		// );
 		console.log(error);
 	}
 	if (data) {

@@ -43,7 +43,12 @@ function Register(props) {
 			props.history.push("/login");
 		},
 		onError: (err) => {
-			setErrors(err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors);
+			setErrors(
+				err.graphQLErrors &&
+					err.graphQLErrors[0] &&
+					err.graphQLErrors[0].extensions &&
+					err.graphQLErrors[0].extensions.errors
+			);
 		},
 	});
 
