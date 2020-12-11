@@ -9,6 +9,7 @@ import { setContext } from "@apollo/client/link/context";
 import { useAuthDispatch } from "../context/auth";
 
 export default function ApolloProvider(props) {
+	//will need to add WebsocketLink in the future for subscription
 	const dispatch = useAuthDispatch();
 
 	const httpLink = new HttpLink({ uri: "http://localhost:4000" });
