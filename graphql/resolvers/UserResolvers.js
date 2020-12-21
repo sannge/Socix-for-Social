@@ -78,7 +78,7 @@ module.exports = {
 
 				if (!correctPassword) {
 					errors.password = "Password is incorrect!";
-					throw new AuthenticationError("Password is incorrect", { errors });
+					throw new UserInputError("Password is incorrect", { errors });
 				}
 
 				const token = jwt.sign(
@@ -91,7 +91,6 @@ module.exports = {
 					JWT_SECRET,
 					{ expiresIn: "1h" }
 				);
-
 				return {
 					...user.toJSON(),
 					createdAt: user.createdAt.toISOString(),

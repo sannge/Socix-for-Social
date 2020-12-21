@@ -5,7 +5,6 @@ import Brand from "../../assets/twitter_header_photo_1.png";
 import FormButton from "../../components/Buttons/FormButton";
 import { gql, useLazyQuery } from "@apollo/client";
 import { useAuthDispatch } from "../../context/auth";
-import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const LOGIN_USER = gql`
@@ -29,7 +28,7 @@ function Login({ history }) {
 
 	const dispatch = useAuthDispatch();
 
-	const [loginUser, { loading, error }] = useLazyQuery(LOGIN_USER, {
+	const [loginUser, { loading }] = useLazyQuery(LOGIN_USER, {
 		onError: (err) => {
 			setErrors(
 				err.graphQLErrors &&
@@ -37,6 +36,7 @@ function Login({ history }) {
 					err.graphQLErrors[0].extensions &&
 					err.graphQLErrors[0].extensions.errors
 			);
+			console.log(err);
 		},
 		onCompleted: (data) => {
 			dispatch({ type: "LOGIN", payload: data.login });
@@ -55,11 +55,13 @@ function Login({ history }) {
 				<img className={classes.brand} src={Brand} alt='' />
 
 				<div className={classes.eachField}>
-					<label className={errors.email && classes.textRed} htmlFor='email'>
-						{errors.email ?? "Email"}
+					<label
+						className={errors && errors.email && classes.textRed}
+						htmlFor='email'>
+						{errors && errors.email ? errors.email : "Email"}
 					</label>
 					<input
-						className={errors.email && classes.boxRed}
+						className={errors && errors.email && classes.boxRed}
 						name='email'
 						value={variables.email}
 						onChange={(e) => {
@@ -72,12 +74,12 @@ function Login({ history }) {
 
 				<div className={classes.eachField}>
 					<label
-						className={errors.password && classes.textRed}
+						className={errors && errors.password && classes.textRed}
 						htmlFor='password'>
-						{errors.password ?? "Password"}
+						{errors && errors.password ? errors.password : "Password"}
 					</label>
 					<input
-						className={errors.password && classes.boxRed}
+						className={errors && errors.password && classes.boxRed}
 						name='password'
 						value={variables.password}
 						onChange={(e) => {

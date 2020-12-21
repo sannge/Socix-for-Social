@@ -7,11 +7,11 @@ module.exports = {
 			return parent.createdAt.toISOString();
 		},
 	},
-	User: {
-		createdAt: (parent) => {
-			return parent.createdAt.toISOString();
-		},
-	},
+	// User: {
+	// 	createdAt: (parent) => {
+	// 		return parent.createdAt.toISOString();
+	// 	},
+	// },
 	Query: {
 		...userResolvers.Query,
 		...messageResolvers.Query,

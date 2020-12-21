@@ -26,7 +26,7 @@ const REGISTER_USER = gql`
 		}
 	}
 `;
-
+//swapping Css with material ui components 
 function Register(props) {
 	const [variables, setVariables] = useState({
 		username: "",
