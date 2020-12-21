@@ -4,11 +4,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AuthProvider } from "./context/auth";
 import ApolloProvider from "./client/ApolloClient";
+import { theme } from "./theme";
+import { ThemeProvider } from "@material-ui/core/styles";
 
 ReactDOM.render(
 	<AuthProvider>
 		<ApolloProvider>
-			<App />
+			<ThemeProvider theme={theme}>
+				<App />
+			</ThemeProvider>
 		</ApolloProvider>
 	</AuthProvider>,
 	document.getElementById("root")

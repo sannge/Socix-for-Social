@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, Redirect } from "react-router-dom";
-import classes from "./Register.module.css";
+
 
 import Brand from "../../assets/twitter_header_photo_1.png";
 import FormButton from "../../components/Buttons/FormButton";
@@ -58,11 +58,12 @@ function Register(props) {
 	};
 
 	return (
-		<div className={classes.register}>
-			<form className={classes.form}>
-				<img className={classes.brand} src={Brand} alt='' />
+		<div>
+			<form>
+				hi
+				{/* <img className={classes.brand} src={Brand} alt='' /> */}
 				{/* <h3>Sign Up</h3> */}
-				<div className={classes.eachField}>
+				{/* <div className={classes.eachField}>
 					<label
 						className={errors.username && classes.textRed}
 						htmlFor='username'>
@@ -153,7 +154,7 @@ function Register(props) {
 							Login Here
 						</Link>
 					</span>
-				</div>
+				</div> */}
 			</form>
 		</div>
 	);
