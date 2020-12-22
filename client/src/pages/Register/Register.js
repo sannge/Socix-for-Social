@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Brand from "../../assets/twitter_header_photo_1.png";
-import FormButton from "../../components/Buttons/FormButton";
-import Loading from "../../components/ButtonLoading";
 
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -13,6 +11,56 @@ import {
 	TextField,
 	Typography,
 } from "@material-ui/core";
+
+import Loading from "../../components/Loading";
+import Error from "../../components/Error";
+
+const useStyles = makeStyles((theme) => ({
+	formContainer: {
+		marginTop: theme.spacing(10),
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "center",
+	},
+	brand: {
+		width: "55%",
+		alignSelf: "center",
+		marginLeft: "13%",
+	},
+	form: {
+		width: "90%",
+	},
+	outlineColor: {
+		"& .MuiInputLabel-root": {
+			marginTop: "-7px",
+		},
+		"& .MuiOutlinedInput-input:-webkit-autofill": {
+			padding: "10px",
+		},
+		"& .MuiOutlinedInput-root": {
+			height: "40px",
+			"& fieldset": {
+				borderRadius: "7px",
+			},
+			"&.Mui-focused fieldset": {
+				borderColor: theme.palette.primary.main,
+				borderWidth: "2px",
+			},
+		},
+	},
+	button: {
+		borderRadius: "5px",
+		marginTop: "15px",
+		paddingTop: "12px",
+		paddingBottom: "12px",
+	},
+	toLogin: {
+		marginTop: "15px",
+	},
+	link: {
+		textDecoration: "none",
+	},
+}));
 
 const REGISTER_USER = gql`
 	mutation register(
@@ -42,6 +90,7 @@ function Register(props) {
 	});
 
 	const [errors, setErrors] = useState({});
+	const [displayError, setDisplayError] = useState(false);
 
 	const [registerUser, { loading }] = useMutation(REGISTER_USER, {
 		//first one is caches
@@ -49,12 +98,16 @@ function Register(props) {
 			props.history.push("/login");
 		},
 		onError: (err) => {
-			setErrors(
-				err.graphQLErrors &&
-					err.graphQLErrors[0] &&
-					err.graphQLErrors[0].extensions &&
-					err.graphQLErrors[0].extensions.errors
-			);
+			if (
+				err &&
+				err.graphQLErrors[0] &&
+				err.graphQLErrors[0].extensions &&
+				err.graphQLErrors[0].extensions.errors
+			) {
+				setErrors(err.graphQLErrors[0].extensions.errors);
+			} else {
+				setDisplayError(true);
+			}
 		},
 	});
 
@@ -63,210 +116,105 @@ function Register(props) {
 		registerUser({ variables });
 	};
 
-	const useStyles = makeStyles((theme) => ({
-		formContainer: {
-			marginTop: theme.spacing(10),
-			display: "flex",
-			flexDirection: "column",
-			alignItems: "center",
-		},
-		brand: {
-			width: "55%",
-			alignSelf: "center",
-			marginLeft: "16%",
-		},
-		form: {
-			width: "90%",
-		},
-		outlineColor: {
-			"& .MuiInputLabel-root": {
-				marginTop: "-7px",
-			},
-			"& .MuiOutlinedInput-root": {
-				padding: "0",
-				height: "40px",
-				"& fieldset": {
-					borderRadius: "5px",
-				},
-				"&.Mui-focused fieldset": {
-					borderColor: theme.palette.primary.main,
-					borderWidth: "2px",
-				},
-			},
-		},
-		button: {
-			borderRadius: "5px",
-			marginTop: "15px",
-			paddingTop: "12px",
-			paddingBottom: "12px",
-		},
-		toLogin: {
-			marginTop: "15px",
-		},
-		link: {
-			textDecoration: "none",
-		},
-	}));
-
 	const classes = useStyles();
 
 	return (
-		// <div>
-		// 	<form>
-		// 		hi
-		// 		{/* <img className={classes.brand} src={Brand} alt='' /> */}
-		// 		{/* <h3>Sign Up</h3> */}
-		// 		{/* <div className={classes.eachField}>
-		// 			<label
-		// 				className={errors.username && classes.textRed}
-		// 				htmlFor='username'>
-		// 				{errors.username ?? "Username"}
-		// 			</label>
-		// 			<input
-		// 				className={errors.username && classes.boxRed}
-		// 				name='username'
-		// 				type='text'
-		// 				value={variables.username}
-		// 				onChange={(e) => {
-		// 					setErrors({ ...errors, username: null });
-		// 					setVariables({ ...variables, username: e.target.value });
-		// 				}}
-		// 				required={errors.username}
-		// 			/>
-		// 		</div>
-
-		// 		<div className={classes.eachField}>
-		// 			<label className={errors.email && classes.textRed} htmlFor='email'>
-		// 				{errors.email ?? "Email"}
-		// 			</label>
-		// 			<input
-		// 				className={errors.email && classes.boxRed}
-		// 				name='email'
-		// 				value={variables.email}
-		// 				onChange={(e) => {
-		// 					setErrors({ ...errors, email: null });
-		// 					setVariables({ ...variables, email: e.target.value });
-		// 				}}
-		// 				type='text'
-		// 			/>
-		// 		</div>
-
-		// 		<div className={classes.eachField}>
-		// 			<label
-		// 				className={errors.password && classes.textRed}
-		// 				htmlFor='password'>
-		// 				{errors.password ?? "Password"}
-		// 			</label>
-		// 			<input
-		// 				className={errors.password && classes.boxRed}
-		// 				name='password'
-		// 				value={variables.password}
-		// 				onChange={(e) => {
-		// 					setErrors({ ...errors, password: null });
-		// 					setVariables({ ...variables, password: e.target.value });
-		// 				}}
-		// 				type='password'
-		// 			/>
-		// 		</div>
-
-		// 		<div className={classes.eachField}>
-		// 			<label
-		// 				className={errors.confirmPassword && classes.textRed}
-		// 				htmlFor='confirmPassword'>
-		// 				{errors.confirmPassword ?? "Confirm Password"}
-		// 			</label>
-		// 			<input
-		// 				className={errors.confirmPassword && classes.boxRed}
-		// 				name='confirmPassword'
-		// 				value={variables.confirmPassword}
-		// 				onChange={(e) => {
-		// 					setErrors({ ...errors, confirmPassword: null });
-		// 					setVariables({ ...variables, confirmPassword: e.target.value });
-		// 				}}
-		// 				type='password'
-		// 			/>
-		// 		</div>
-
-		// 		<FormButton
-		// 			onClick={submitRegisterForm}
-		// 			disabled={loading}
-		// 			type='submit'>
-		// 			{loading ? (
-		// 				<div style={{ display: "flex", justifyContent: "center" }}>
-		// 					<Loading />
-		// 				</div>
-		// 			) : (
-		// 				"Register"
-		// 			)}
-		// 		</FormButton>
-
-		// 		<div className={classes.toLogin}>
-		// 			Already have an account?{" "}
-		// 			<span>
-		// 				<Link className={classes.link} to='/login'>
-		// 					Login Here
-		// 				</Link>
-		// 			</span>
-		// 		</div> */}
-		// 	</form>
-		// </div>
-
 		<Container component='main' maxWidth='sm'>
 			<div className={classes.formContainer}>
 				<img className={classes.brand} src={Brand} alt='' />
+				<Error display={displayError} setDisplay={setDisplayError} />
 				{/* <Typography component='h1' variant='h5'>
 					Sign in
 				</Typography> */}
-				<form className={classes.form}>
+				<form onSubmit={submitRegisterForm} className={classes.form}>
 					<TextField
 						variant='outlined'
 						margin='normal'
 						fullWidth
-						// error
+						error={errors.username}
 						id='username'
-						label='Username'
+						label={
+							errors.username && variables.username === "" ? "" : "Username"
+						}
 						name='username'
-						// helperText='Incorrect Entry'
+						autoFocus
+						helperText={errors.username}
 						autoComplete='name'
 						className={classes.outlineColor}
+						onChange={(e) => {
+							setErrors({ ...errors, username: null });
+							setVariables({ ...variables, username: e.target.value });
+						}}
+						value={variables.username}
 					/>
 					<TextField
 						variant='outlined'
 						margin='normal'
 						fullWidth
+						error={errors.email}
 						id='email'
-						label='Email Address'
-						name='Email'
+						label={
+							errors.email && variables.email === "" ? "" : "Email Address"
+						}
+						name='email'
+						helperText={errors.email}
 						autoComplete='email'
 						className={classes.outlineColor}
+						onChange={(e) => {
+							setErrors({ ...errors, email: null });
+							setVariables({ ...variables, email: e.target.value });
+						}}
+						value={variables.email}
 					/>
 					<TextField
 						variant='outlined'
 						margin='normal'
 						fullWidth
+						error={errors.password}
 						id='password'
-						label='Password'
+						label={
+							errors.password && variables.password === "" ? "" : "Password"
+						}
 						name='password'
-						autoComplete='password'
+						helperText={errors.password}
+						type='password'
 						className={classes.outlineColor}
+						onChange={(e) => {
+							setErrors({ ...errors, password: null });
+							setVariables({ ...variables, password: e.target.value });
+						}}
+						value={variables.password}
 					/>
 					<TextField
 						variant='outlined'
 						margin='normal'
 						fullWidth
+						error={errors.confirmPassword}
 						id='confirmPassword'
-						label='Confirm Password'
+						label={
+							errors.confirmPassword && variables.confirmPassword === ""
+								? ""
+								: "Confirm Password"
+						}
 						name='confirmPassword'
-						autoComplete='password'
+						helperText={errors.confirmPassword}
+						autoComplete='off'
+						type='password'
 						className={classes.outlineColor}
+						onChange={(e) => {
+							setErrors({ ...errors, confirmPassword: null });
+							setVariables({ ...variables, confirmPassword: e.target.value });
+						}}
+						value={variables.confirmPassword}
 					/>
 
 					<Button
+						onClick={submitRegisterForm}
 						className={classes.button}
 						variant='contained'
 						color='primary'
 						fullWidth>
-						Sign in
+						{loading ? <Loading size={18} color='white' /> : "Sign in"}
 					</Button>
 				</form>
 				<div className={classes.toLogin}>

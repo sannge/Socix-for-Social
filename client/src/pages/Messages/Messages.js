@@ -3,7 +3,7 @@ import classes from "./Messages.module.css";
 import { GET_USERS } from "../constants/GqlQueries";
 import { useQuery } from "@apollo/client";
 import ErrorComponent from "../../components/Error";
-import ButtonLoading from "../../components/ButtonLoading";
+import Loading from "../../components/Loading";
 
 function Messages() {
 	const { data, loading, error } = useQuery(GET_USERS);
@@ -26,7 +26,7 @@ function Messages() {
 			<div className={classes.MessagesContainer}>
 				{loading ? (
 					<div className={classes.error}>
-						<ButtonLoading color />
+						<Loading color='white' size={20} />
 					</div>
 				) : error ? (
 					<div className={classes.error}>
