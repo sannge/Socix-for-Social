@@ -29,7 +29,7 @@ const useStyles = makeStyles({
 	// },
 });
 
-function Error({ display, setDisplay }) {
+function Error({ display, setDisplay, alwaysDisplay }) {
 	const [show, setShow] = useState(false);
 	const [fullOpacity, setFullOpacity] = useState(false);
 	useEffect(() => {
@@ -69,6 +69,19 @@ function Error({ display, setDisplay }) {
 			{show ? (
 				<Alert
 					className={[classes.alert, fullOpacity && "show"].join(" ")}
+					severity='error'>
+					Something is wrong! Please try again later.
+				</Alert>
+			) : alwaysDisplay ? (
+				<Alert
+					style={{
+						marginTop: "10px",
+						marginBottom: "10px",
+						padding: "20px",
+						paddingLeft: "40px",
+						paddingRight: "40px",
+						borderRadius: "10px",
+					}}
 					severity='error'>
 					Something is wrong! Please try again later.
 				</Alert>
