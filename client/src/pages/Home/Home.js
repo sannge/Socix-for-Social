@@ -1,8 +1,7 @@
 import React from "react";
-import classes from "./Home.module.css";
 
 function Home() {
-	return <div className={classes.Home}>Home</div>;
+	return <div style={{marginTop:'80px',background: '#eee',height: '100vh'}}>Home</div>;
 }
 
 export default Home;

@@ -5,24 +5,32 @@ const { Op } = require("sequelize");
 
 module.exports = {
 	Query: {
+		//FROM has to be username
 		getMessages: async (parent, { from }, { user }) => {
 			try {
 				if (!user) throw new AuthenticationError("Unauthenticated!");
 
 				const otherUser = await User.findOne({
 					where: {
-						email: from,
+						username: from,
 					},
 				});
 
-				if (!otherUser) throw new UserInputError("User not found");
+				const thisUser = await User.findOne({
+					where: {
+						email: user.email,
+					},
+				});
 
-				const emails = [user.email, otherUser.email];
+				if (!otherUser || !thisUser)
+					throw new UserInputError("User not found.");
+
+				const usernames = [user.username, otherUser.username];
 
 				const messages = await Message.findAll({
 					where: {
-						from: { [Op.in]: emails },
-						to: { [Op.in]: emails },
+						from: { [Op.in]: usernames },
+						to: { [Op.in]: usernames },
 					},
 					order: [["createdAt", "DESC"]],
 				});
@@ -46,7 +54,9 @@ module.exports = {
 					},
 				});
 				if (!recipient) throw new UserInputError("User not found");
-
+				else if (recipient.email === user.email) {
+					throw new UserInputError("You cannot message yourself.");
+				}
 				if (content.trim() === "") {
 					throw new UserInputError("Message is empty");
 				}
