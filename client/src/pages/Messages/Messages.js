@@ -47,6 +47,7 @@ function Messages() {
 					<ErrorComponent alwaysDisplay />
 				</div>
 			) : (
+				// styling the getUsers section like messenger
 				<div style={{ width: "100%" }}>
 					<Grid container>
 						<Grid style={{ marginTop: "20px", flex: "0 0 auto" }} item xs={3}>
