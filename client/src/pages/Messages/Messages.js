@@ -65,6 +65,7 @@ function Messages() {
 											{user.content}
 										</div>
 									</div> */}
+									{/* need to fix this part position fixed for user section */}
 									<Grid spacing={7} alignItems='center' container>
 										<Grid item xs={2}>
 											<Avatar alt={user.username} src={user.imageUrl} />
