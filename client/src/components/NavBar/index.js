@@ -7,6 +7,7 @@ import MenuTwoToneIcon from "@material-ui/icons/MenuTwoTone";
 import ChatBubbleOutlineTwoToneIcon from "@material-ui/icons/ChatBubbleOutlineTwoTone";
 import PersonOutlineTwoToneIcon from "@material-ui/icons/PersonOutlineTwoTone";
 import ExitToAppTwoToneIcon from "@material-ui/icons/ExitToAppTwoTone";
+import { Avatar } from "@material-ui/core";
 
 function NavBar() {
 	const authState = useAuthState();
@@ -64,8 +65,12 @@ function NavBar() {
 							activeClassName={classes.underLined}
 							className={classes.Link}>
 							<div className={classes.eachMenu}>
-								<PersonOutlineTwoToneIcon style={{ marginRight: "5px" }} />
-								<p>{authState.user.username}</p>
+								{authState.user.imageUrl ? (
+									<Avatar src={authState.user.imageUrl} />
+								) : (
+									<Avatar />
+								)}
+								<p style={{ marginLeft: "10px" }}>{authState.user.username}</p>
 							</div>
 						</NavLink>
 						<NavLink

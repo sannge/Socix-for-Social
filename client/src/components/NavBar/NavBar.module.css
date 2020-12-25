@@ -38,7 +38,8 @@
 }
 
 .underLined {
-	border-bottom: 4px solid rgb(0, 130, 255);
+	background: rgba(100, 100, 100, 0.1);
+	border-radius: 30px;
 	/* color: rgb(0, 130, 255) !important; */
 }
 
@@ -47,7 +48,13 @@
 	border: none;
 	margin: 0 20px;
 	cursor: pointer;
-	padding: 10px 3px 2px 3px;
+	padding: 2px 5px 2px 1px;
+}
+
+.Menu button:hover {
+	padding: 2px 5px 2px 1px;
+	background: rgba(100, 100, 100, 0.1);
+	border-radius: 30px;
 }
 
 .Menu button:focus {
@@ -59,7 +66,13 @@
 	color: black;
 	margin: 0 20px;
 	font-size: 0.88rem;
-	padding: 10px 3px 2px 3px;
+	/* padding: 10px 3px 2px 3px; */
+	padding: 2px 5px 2px 1px;
+}
+
+.Link:hover {
+	background: rgba(100, 100, 100, 0.1);
+	border-radius: 30px;
 }
 
 @media screen and (max-width: 767px) {
@@ -72,6 +85,7 @@
 		padding: 10px;
 		flex-flow: column;
 		box-shadow: 0 0 3px #ccc;
+		z-index: 1000000000000000;
 	}
 
 	.Menu button,
