@@ -65,7 +65,7 @@ function Messages() {
 											{user.content}
 										</div>
 									</div> */}
-									{/* need to fix this part position fixed for user section */}
+									{/* need to fix this part position fixed for user section, change content depending on screen width */}
 									<Grid spacing={7} alignItems='center' container>
 										<Grid item xs={2}>
 											<Avatar alt={user.username} src={user.imageUrl} />
@@ -80,6 +80,7 @@ function Messages() {
 								</div>
 							))}
 						</Grid>
+						{/* this can be grid as usual since this will grow and shrink */}
 						<Grid style={{ flex: "1 1 auto" }} item xs={9}>
 							<div
 								style={{
