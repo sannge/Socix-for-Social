@@ -6,6 +6,7 @@ import { Avatar, Container, Grid, Typography } from "@material-ui/core";
 import Loading from "../../components/Loading";
 import Divider from "../../components/Divider";
 import { makeStyles } from "@material-ui/core/styles";
+import { useAuthState, useAuthDispatch } from "../../context/auth";
 
 const useStyles = makeStyles((theme) => ({
 	messagesContainer: {
@@ -64,6 +65,8 @@ function Messages() {
 	const [showLatestMessage, setShowLatestMessage] = useState(
 		window.innerWidth >= 960
 	);
+
+	const authState = useAuthState();
 
 	// if (error) {
 	// 	// console.log(error);
@@ -137,6 +140,8 @@ function Messages() {
 													style={{ color: "#666" }}
 													variant='body2'
 													noWrap={user.latestMessage?.content.length >= 20}>
+													{user.latestMessage?.from ===
+														authState.user.username && "You: "}
 													{user.latestMessage?.content}
 												</Typography>
 											</div>
@@ -160,6 +165,7 @@ function Messages() {
 												<Typography
 													variant='body2'
 													noWrap={user.latestMessage?.content.length >= 26}>
+													{user.latestMessage?.from}:{" "}
 													{user.latestMessage?.content}
 												</Typography>
 											</div>
@@ -183,6 +189,7 @@ function Messages() {
 												<Typography
 													variant='body2'
 													noWrap={user.latestMessage?.content.length >= 26}>
+													{user.latestMessage?.from}:{" "}
 													{user.latestMessage?.content}
 												</Typography>
 											</div>
@@ -206,6 +213,7 @@ function Messages() {
 												<Typography
 													variant='body2'
 													noWrap={user.latestMessage?.content.length >= 26}>
+													{user.latestMessage?.from}:{" "}
 													{user.latestMessage?.content}
 												</Typography>
 											</div>
