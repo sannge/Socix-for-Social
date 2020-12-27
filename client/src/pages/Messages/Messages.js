@@ -1,135 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { GET_USERS } from "../constants/GqlQueries";
-import { useQuery } from "@apollo/client";
+import { GET_USERS, GET_MESSAGES } from "../constants/GqlQueries";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import ErrorComponent from "../../components/Error";
-import SearchIcon from "@material-ui/icons/Search";
-import {
-	Avatar,
-	Container,
-	Input,
-	TextField,
-	Typography,
-} from "@material-ui/core";
+import { Container } from "@material-ui/core";
 import Loading from "../../components/Loading";
-import Divider from "../../components/Divider";
-import { makeStyles } from "@material-ui/core/styles";
-import { useAuthState, useAuthDispatch } from "../../context/auth";
-
-const useStyles = makeStyles((theme) => ({
-	messagesContainer: {
-		display: "flex",
-	},
-
-	userSection: {
-		marginTop: "10px",
-		background: "white",
-		border: "1px solid #ccc",
-		borderTop: "none",
-		borderBottom: "none",
-		width: "90px",
-		height: "90vh",
-		minWidth: "100px",
-		display: "flex",
-		flexFlow: "column",
-		paddingTop: "10px",
-		[theme.breakpoints.up("md")]: {
-			width: "600px",
-		},
-		// [theme.breakpoints.down("md")]: {
-
-		// },
-		overflowY: "scroll",
-		overflowX: "hidden",
-	},
-	MessageSection: {
-		marginTop: "10px",
-		marginLeft: "5px",
-		width: "100%",
-		background: "white",
-		height: "90vh",
-	},
-	userContainer: {
-		width: "400px",
-	},
-	userInnerContainer: {
-		display: "flex",
-		padding: "20px",
-		paddingBottom: "10px",
-		cursor: "pointer",
-		margin: "10px",
-		borderRadius: "12px",
-		"&:hover": {
-			background: "rgba(100,100,100,0.1)",
-		},
-		[theme.breakpoints.down("md")]: {
-			margin: "5px",
-		},
-	},
-
-	avatar: {
-		width: theme.spacing(7),
-		height: theme.spacing(7),
-	},
-	latestMessageContainer: {
-		marginLeft: "10px",
-		width: "263px",
-	},
-	messageAndTime: {
-		display: "flex",
-	},
-	searchBar: {
-		justifySelf: "center",
-		alignSelf: "center",
-		position: "relative",
-		// border: "none",
-		// padding: "10px",
-		// background: "#eee",
-		// width: "70px",
-		// borderRadius: "20px",
-		// outline: "none",
-		display: "flex",
-		"& input": {
-			width: "50px",
-			paddingLeft: "24px",
-			border: "none",
-			background: "#eee",
-			padding: "10px",
-			borderRadius: "20px",
-			outline: "none",
-			[theme.breakpoints.up("md")]: {
-				width: "300px",
-			},
-		},
-		"& .icon": {
-			position: "absolute",
-			top: "9px",
-			left: "4px",
-			color: "#888",
-			fontSize: "1.2em",
-		},
-	},
-}));
+import { useAuthState } from "../../context/auth";
+import useStyles from "./MessagesStyle";
+import UserSection from "./UserSection/UserSection";
+import MessageSection from "./MessageSection/MessageSection";
 
 function Messages() {
 	const { data, loading, error } = useQuery(GET_USERS);
-	const [Error, setError] = useState(true);
-	const [showLtestMessage, setShowLatestMessage] = useState(
-		window.innerWidth >= 960
-	);
-	console.log("GETTING USERS: ", data);
+	const [
+		getMessages,
+		{ loading: messagesLoading, data: messagesData },
+	] = useLazyQuery(GET_MESSAGES);
+
+	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
+	const [selectedUser, setSelectedUser] = useState(null);
+
 	const authState = useAuthState();
 
-	// if (error) {
-	// 	// console.log(error);
-	// 	// console.log(
-	// 	// 	"HIHIHI:",
-	// 	// 	error.graphQLErrors[0].message === "Unauthenticated"
-	// 	// );
-	// 	console.log(error);
-	// }
-	// if (data) {
-	// 	console.log(data);
-	// }
+	useEffect(() => {
+		if (selectedUser) {
+			getMessages({ variables: { from: selectedUser } });
+		} else {
+			if (data && data.getUsers && data.getUsers[0]) {
+				setSelectedUser(data.getUsers[0].username);
+			}
+		}
+	}, [selectedUser, data, getMessages]);
+
+	if (messagesData) console.log(messagesData.getMessages);
 
 	useEffect(() => {
 		const showlatestMessageHandler = () => {
@@ -191,57 +93,16 @@ function Messages() {
 				) : (
 					// styling the getUsers section like messenger
 					<div className={classes.messagesContainer} style={{ width: "100%" }}>
-						<div className={classes.userSection}>
-							<div className={classes.searchBar}>
-								<SearchIcon className='icon' />
-								<input type='text' placeholder={`Search`} />
-							</div>
-							{data.getUsers.map((user) => (
-								<div key={user.username}>
-									<div className={classes.userContainer}>
-										<div className={classes.userInnerContainer}>
-											<Avatar
-												sizes='xl'
-												className={classes.avatar}
-												src={user.imageUrl}
-											/>
-											{window.innerWidth < 960 ? (
-												""
-											) : (
-												<div className={classes.latestMessageContainer}>
-													<Typography variant='body1'>
-														{user.username}
-													</Typography>
-													<div className={classes.messageAndTime}>
-														<div style={{ width: "220px" }}>
-															<Typography
-																style={{ color: "#666" }}
-																variant='body2'
-																noWrap>
-																{user.latestMessage?.from ===
-																	authState.user.username && "You: "}
-																{user.latestMessage?.content}
-															</Typography>
-														</div>
-														<div style={{ width: "40px" }}>
-															<Typography
-																variant='body2'
-																style={{ color: "#666" }}>
-																{user.latestMessage &&
-																	timeOutputHandler(
-																		user.latestMessage.createdAt
-																	)}
-															</Typography>
-														</div>
-													</div>
-												</div>
-											)}
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-						<div className={classes.MessageSection}></div>
+						<UserSection
+							data={data}
+							selectedUser={selectedUser}
+							setSelectedUser={setSelectedUser}
+							timeOutputHandler={timeOutputHandler}
+						/>
+						<MessageSection
+							messagesData={messagesData}
+							messagesLoading={messagesLoading}
+						/>
 					</div>
 				)}
 			</Container>

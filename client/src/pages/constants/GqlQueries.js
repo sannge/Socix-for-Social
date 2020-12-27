@@ -16,3 +16,15 @@ export const GET_USERS = gql`
 		}
 	}
 `;
+
+export const GET_MESSAGES = gql`
+	query getMessages($from: String!) {
+		getMessages(from: $from) {
+			uuid
+			from
+			to
+			content
+			createdAt
+		}
+	}
+`;
