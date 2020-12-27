@@ -29,6 +29,7 @@ const authReducer = (state, action) => {
 
 		case "LOGOUT":
 			localStorage.removeItem("token");
+			window.location.reload();
 			return {
 				...state,
 				user: null,

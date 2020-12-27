@@ -44,9 +44,13 @@ module.exports = {
 						(m) => m.from === otherUser.username || m.to === otherUser.username
 					);
 					otherUser.latestMessage = latestMessage;
-					console.log(latestMessage);
+					// console.log("LATEST MESSAGE: ", latestMessage);
 					return otherUser;
 				});
+
+				//filter out the users that only have messaged at least once.
+				users = users.filter((user) => user.latestMessage !== undefined);
+				// console.log("USERS: ", users);
 				return users;
 			} catch (err) {
 				throw err;
