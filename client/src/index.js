@@ -3,17 +3,20 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AuthProvider } from "./context/auth";
+import { MessageProvider } from "./context/message";
 import ApolloProvider from "./client/ApolloClient";
 import { theme } from "./theme";
 import { ThemeProvider } from "@material-ui/core/styles";
 
 ReactDOM.render(
 	<AuthProvider>
-		<ApolloProvider>
-			<ThemeProvider theme={theme}>
-				<App />
-			</ThemeProvider>
-		</ApolloProvider>
+		<MessageProvider>
+			<ApolloProvider>
+				<ThemeProvider theme={theme}>
+					<App />
+				</ThemeProvider>
+			</ApolloProvider>
+		</MessageProvider>
 	</AuthProvider>,
 	document.getElementById("root")
 );
