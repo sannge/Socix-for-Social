@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
 		width: "100%",
 		background: "white",
 		height: "90vh",
+		minWidth: "300px",
 	},
 	messagesLoadingContainer: {
 		display: "flex",

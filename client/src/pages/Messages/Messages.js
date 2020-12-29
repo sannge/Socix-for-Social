@@ -4,32 +4,42 @@ import { useQuery, useLazyQuery } from "@apollo/client";
 import ErrorComponent from "../../components/Error";
 import { Container } from "@material-ui/core";
 import Loading from "../../components/Loading";
-import { useAuthState } from "../../context/auth";
+// import { useAuthState } from "../../context/auth";
 import useStyles from "./MessagesStyle";
 import UserSection from "./UserSection/UserSection";
 import MessageSection from "./MessageSection/MessageSection";
+import { useMessageDispatch, useMessageState } from "../../context/message";
 
 function Messages() {
-	const { data, loading, error } = useQuery(GET_USERS);
+	const messageDispatch = useMessageDispatch();
+	const { users, selectedUser } = useMessageState();
+	const { loading, error } = useQuery(GET_USERS, {
+		onCompleted: (data) => {
+			messageDispatch({ type: "SET_USERS", payload: data.getUsers });
+		},
+	});
 	const [
 		getMessages,
 		{ loading: messagesLoading, data: messagesData },
 	] = useLazyQuery(GET_MESSAGES);
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
-	const [selectedUser, setSelectedUser] = useState(null);
+	// const [selectedUser, setSelectedUser] = useState(null);
 
-	const authState = useAuthState();
+	// const authState = useAuthState();
 
 	useEffect(() => {
 		if (selectedUser) {
 			getMessages({ variables: { from: selectedUser } });
 		} else {
-			if (data && data.getUsers && data.getUsers[0]) {
-				setSelectedUser(data.getUsers[0].username);
+			if (users && users[0]) {
+				messageDispatch({
+					type: "SET_SELECTED_USER",
+					payload: users[0].username,
+				});
 			}
 		}
-	}, [selectedUser, data, getMessages]);
+	}, [selectedUser, messageDispatch, users, getMessages]);
 
 	if (messagesData) console.log(messagesData.getMessages);
 
@@ -62,7 +72,6 @@ function Messages() {
 		}
 	};
 
-	console.log(data && data.getUsers);
 	const classes = useStyles();
 
 	return (
@@ -93,12 +102,7 @@ function Messages() {
 				) : (
 					// styling the getUsers section like messenger
 					<div className={classes.messagesContainer} style={{ width: "100%" }}>
-						<UserSection
-							data={data}
-							selectedUser={selectedUser}
-							setSelectedUser={setSelectedUser}
-							timeOutputHandler={timeOutputHandler}
-						/>
+						<UserSection users={users} timeOutputHandler={timeOutputHandler} />
 						<MessageSection
 							messagesData={messagesData}
 							messagesLoading={messagesLoading}
