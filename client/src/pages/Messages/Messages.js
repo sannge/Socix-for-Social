@@ -33,8 +33,15 @@ function Messages() {
 	useEffect(() => {
 		if (selectedUser && selectedUser.username) {
 			getMessages({ variables: { from: selectedUser.username } });
+		} else {
+			if (users && users[0]) {
+				messageDispatch({
+					type: "SET_SELECTED_USER",
+					payload: users[0].username,
+				});
+			}
 		}
-	}, [selectedUser]);
+	}, [selectedUser, users]);
 
 	useEffect(() => {
 		if (messagesData) {

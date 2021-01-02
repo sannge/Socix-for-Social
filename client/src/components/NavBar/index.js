@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import { useAuthState, useAuthDispatch } from "../../context/auth";
 import MenuTwoToneIcon from "@material-ui/icons/MenuTwoTone";
 import ChatBubbleOutlineTwoToneIcon from "@material-ui/icons/ChatBubbleOutlineTwoTone";
-import PersonOutlineTwoToneIcon from "@material-ui/icons/PersonOutlineTwoTone";
+// import PersonOutlineTwoToneIcon from "@material-ui/icons/PersonOutlineTwoTone";
 import ExitToAppTwoToneIcon from "@material-ui/icons/ExitToAppTwoTone";
 import { Avatar } from "@material-ui/core";
 
@@ -42,6 +42,7 @@ function NavBar() {
 
 	const logoutHandler = () => {
 		dispatch({ type: "LOGOUT" });
+		window.location.href = "/login";
 	};
 
 	return (
