@@ -3,8 +3,11 @@ import Loading from "../../../components/Loading";
 import useStyles from "./MessageSectionStyles";
 import { useMessageState } from "../../../context/message";
 
-function MessageSection({ messagesData, messagesLoading }) {
+function MessageSection({ messagesLoading }) {
 	const classes = useStyles();
+	const { users, selectedUser } = useMessageState();
+	const messagesData = users?.find((u) => u.username === selectedUser?.username)
+		?.messages;
 
 	return (
 		<div className={classes.MessageSection}>
@@ -14,8 +17,8 @@ function MessageSection({ messagesData, messagesLoading }) {
 				</div>
 			) : (
 				<div>
-					{messagesData && messagesData.getMessages.length > 0 ? (
-						messagesData.getMessages.map((message) => (
+					{messagesData && messagesData.length > 0 ? (
+						messagesData.map((message) => (
 							<p key={message.uuid}>{message.content}</p>
 						))
 					) : (

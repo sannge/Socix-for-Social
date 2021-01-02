@@ -13,6 +13,7 @@ import { useMessageDispatch, useMessageState } from "../../context/message";
 function Messages() {
 	const messageDispatch = useMessageDispatch();
 	const { users, selectedUser } = useMessageState();
+
 	const { loading, error } = useQuery(GET_USERS, {
 		onCompleted: (data) => {
 			messageDispatch({ type: "SET_USERS", payload: data.getUsers });
@@ -24,24 +25,28 @@ function Messages() {
 	] = useLazyQuery(GET_MESSAGES);
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
-	// const [selectedUser, setSelectedUser] = useState(null);
 
-	// const authState = useAuthState();
+	// let selectedUser = users?.find((u) => u.selected === true);
+
+	console.log("just got: ", selectedUser);
 
 	useEffect(() => {
-		if (selectedUser) {
-			getMessages({ variables: { from: selectedUser } });
-		} else {
-			if (users && users[0]) {
-				messageDispatch({
-					type: "SET_SELECTED_USER",
-					payload: users[0].username,
-				});
-			}
+		if (selectedUser && selectedUser.username) {
+			getMessages({ variables: { from: selectedUser.username } });
 		}
-	}, [selectedUser, messageDispatch, users, getMessages]);
+	}, [selectedUser]);
 
-	if (messagesData) console.log(messagesData.getMessages);
+	useEffect(() => {
+		if (messagesData) {
+			messageDispatch({
+				type: "SET_USER_MESSAGES",
+				payload: {
+					username: selectedUser?.username,
+					messages: messagesData.getMessages,
+				},
+			});
+		}
+	}, [messagesData]);
 
 	useEffect(() => {
 		const showlatestMessageHandler = () => {
@@ -67,7 +72,6 @@ function Messages() {
 		} else if (timeSoFar / (1000 * 60 * 60 * 24 * 365) < 1) {
 			return ` · ${Math.ceil(timeSoFar / (1000 * 60 * 60 * 24))}d`;
 		} else {
-			console.log(Math.ceil(timeSoFar / (1000 * 60 * 60 * 24 * 365)));
 			return ` · ${Math.ceil(timeSoFar / (1000 * 60 * 60 * 24 * 365))}y`;
 		}
 	};
@@ -103,10 +107,7 @@ function Messages() {
 					// styling the getUsers section like messenger
 					<div className={classes.messagesContainer} style={{ width: "100%" }}>
 						<UserSection users={users} timeOutputHandler={timeOutputHandler} />
-						<MessageSection
-							messagesData={messagesData}
-							messagesLoading={messagesLoading}
-						/>
+						<MessageSection messagesLoading={messagesLoading} />
 					</div>
 				)}
 			</Container>

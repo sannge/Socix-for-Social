@@ -8,6 +8,7 @@ import { useMessageState, useMessageDispatch } from "../../../context/message";
 function UserSection({ timeOutputHandler, users }) {
 	const classes = useStyles();
 	const authState = useAuthState();
+
 	const { selectedUser } = useMessageState();
 	const messageDispatch = useMessageDispatch();
 
@@ -30,7 +31,8 @@ function UserSection({ timeOutputHandler, users }) {
 						<div className={classes.userContainer}>
 							<div
 								className={[
-									selectedUser === user.username && classes.backgroundSelected,
+									selectedUser?.username === user.username &&
+										classes.backgroundSelected,
 									classes.userInnerContainer,
 								].join(" ")}>
 								<Avatar
