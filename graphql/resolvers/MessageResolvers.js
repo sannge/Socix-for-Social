@@ -50,7 +50,7 @@ module.exports = {
 
 				const recipient = await User.findOne({
 					where: {
-						email: to,
+						username: to,
 					},
 				});
 				if (!recipient) throw new UserInputError("User not found");
@@ -62,7 +62,7 @@ module.exports = {
 				}
 
 				const message = await Message.create({
-					from: user.email,
+					from: user.username,
 					to,
 					content,
 				});

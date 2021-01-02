@@ -8,11 +8,12 @@ const useStyles = makeStyles((theme) => ({
 		borderTop: "none",
 		borderBottom: "none",
 		width: "90px",
-		height: "90vh",
+		height: "87vh",
 		minWidth: "100px",
 		display: "flex",
 		flexFlow: "column",
 		paddingTop: "10px",
+		overflowY: "scroll",
 		[theme.breakpoints.up("md")]: {
 			width: "600px",
 		},
