@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
+	//MessageSection and Message component's styles
 	MessageSection: {
 		marginTop: "10px",
 		padding: "10px",
