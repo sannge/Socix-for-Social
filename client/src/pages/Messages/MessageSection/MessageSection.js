@@ -23,6 +23,7 @@ function MessageSection({ messagesLoading }) {
 						messagesData.map((message, index) => (
 							<Fragment>
 								<Message key={message.uuid} message={message} />
+
 								{/* {index === messagesData.length - 1 && (
 									<div className={classes.invisible}>
 										<hr style={{ margin: "0", color: "white" }} />
