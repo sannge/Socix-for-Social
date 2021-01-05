@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 		alignItems: "center",
 	},
 	messageBox: {
-		height: "100%",
+		height: "95%",
 		display: "flex",
 		flexDirection: "column-reverse",
 		overflowY: "scroll",
@@ -30,27 +30,55 @@ const useStyles = makeStyles((theme) => ({
 	},
 	eachMessageContainer1: {
 		display: "flex",
-		margin: "12px 15px",
+		margin: "5px 15px",
 		marginLeft: "auto",
 		maxWidth: "70%",
 	},
 	eachMessageContainer1Other: {
 		display: "flex",
-		margin: "12px 15px",
+		margin: "5px 15px",
 		marginRight: "auto",
 		maxWidth: "70%",
 	},
 	eachMessageContainer2: {
 		padding: "8px 12px",
-		borderRadius: "12px 0px 15px 12px",
-		color: "black",
+		borderRadius: "20px 20px 20px 30px",
 		background: "rgb(0, 130, 255)",
 		color: "#f4f4f4",
 	},
 	eachMessageContainer2Other: {
 		background: "#ddd",
 		padding: "8px 12px",
-		borderRadius: "0px 12px 12px 15px",
+		borderRadius: "20px 20px 20px 20px",
+	},
+	sendArea: {
+		display: "flex",
+		alignItems: "center",
+	},
+	facility: {
+		width: "85px",
+		display: "flex",
+		transition: "all .1s ease-in-out",
+	},
+	sendAreaIcons: {
+		color: "rgb(0, 130, 255)",
+	},
+	textArea: {
+		alignSelf: "center",
+		width: "100%",
+		"& input": {
+			boxSizing: "border-box",
+			width: "100%",
+			border: "none",
+			background: "#eee",
+			padding: "10px 15px",
+			marginLeft: "15px",
+			outline: "none",
+			borderRadius: "20px",
+		},
+	},
+	sendIcon: {
+		marginLeft: "23px",
 	},
 }));
 

@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
 		padding: "8px",
 		background: "rgba(0,0,0,0.8)",
 		borderRadius: "10px",
+		fontSize: "12px",
 	},
 }));
 
