@@ -53,8 +53,6 @@ export default function ApolloProvider(props) {
 
 	const linkWithHeader = authLink.concat(httpLink);
 
-	const linkWithHeaderAndError = errorLink.concat(linkWithHeader);
-
 	const splitLink = split(
 		({ query }) => {
 			const definition = getMainDefinition(query);
@@ -63,8 +61,8 @@ export default function ApolloProvider(props) {
 				definition.operation === "subscription"
 			);
 		},
-		errorLink.concat(wsLink),
-		linkWithHeaderAndError
+		wsLink,
+		linkWithHeader
 	);
 
 	const client = new ApolloClient({
@@ -72,7 +70,7 @@ export default function ApolloProvider(props) {
 		//concat errorLink different way then concating with concat()
 		//it will occur error
 
-		link: splitLink,
+		link: errorLink.concat(splitLink),
 		cache: new InMemoryCache(),
 	});
 	//not adding the logout on networkError 401 because
