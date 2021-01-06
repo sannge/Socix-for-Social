@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { GET_USERS, GET_MESSAGES } from "../constants/GqlQueries";
-import { useQuery, useLazyQuery } from "@apollo/client";
+import { GET_USERS, GET_MESSAGES, NEW_MESSAGE } from "../constants/GqlQueries";
+import { useQuery, useLazyQuery, useSubscription } from "@apollo/client";
 import ErrorComponent from "../../components/Error";
 import { Container } from "@material-ui/core";
 import Loading from "../../components/Loading";
@@ -9,10 +9,13 @@ import useStyles from "./MessagesStyle";
 import UserSection from "./UserSection/UserSection";
 import MessageSection from "./MessageSection/MessageSection";
 import { useMessageDispatch, useMessageState } from "../../context/message";
+import { useAuthState } from "../../context/auth";
 
 function Messages() {
 	const messageDispatch = useMessageDispatch();
 	const { users, selectedUser } = useMessageState();
+
+	const { user } = useAuthState();
 
 	const { loading, error } = useQuery(GET_USERS, {
 		onCompleted: (data) => {
@@ -26,9 +29,31 @@ function Messages() {
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
 
-	// let selectedUser = users?.find((u) => u.selected === true);
-
 	console.log("just got: ", selectedUser);
+
+	const { data: newMessageData, error: newMessageError } = useSubscription(
+		NEW_MESSAGE
+	);
+
+	useEffect(() => {
+		if (newMessageError) {
+			console.log(newMessageError);
+		}
+		if (newMessageData) {
+			console.log("newMessageData: ", newMessageData.newMessage.content);
+			const otherUser =
+				user.username === newMessageData.newMessage.to
+					? newMessageData.newMessage.from
+					: newMessageData.newMessage.to;
+			messageDispatch({
+				type: "ADD_MESSAGE",
+				payload: {
+					username: otherUser,
+					message: newMessageData.newMessage,
+				},
+			});
+		}
+	}, [newMessageData, newMessageError]);
 
 	useEffect(() => {
 		if (selectedUser && selectedUser.username) {

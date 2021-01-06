@@ -3,8 +3,13 @@ import {
 	InMemoryCache,
 	ApolloProvider as Provider,
 	HttpLink,
+	split,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+
+import { getMainDefinition } from "@apollo/client/utilities";
+
+import { WebSocketLink } from "@apollo/client/link/ws";
 
 import { useAuthDispatch } from "../context/auth";
 import { onError } from "@apollo/client/link/error";
@@ -26,6 +31,7 @@ export default function ApolloProvider(props) {
 	});
 
 	const errorLink = onError(({ graphQLErrors, networkError }) => {
+		console.log(graphQLErrors);
 		if (
 			graphQLErrors &&
 			graphQLErrors[0] &&
@@ -34,13 +40,39 @@ export default function ApolloProvider(props) {
 			dispatch({ type: "LOGOUT" });
 		}
 	});
+
+	const wsLink = new WebSocketLink({
+		uri: "ws://localhost:4000/graphql",
+		options: {
+			reconnect: true,
+			connectionParams: {
+				Authorization: localStorage.getItem("token"),
+			},
+		},
+	});
+
 	const linkWithHeader = authLink.concat(httpLink);
+
+	const linkWithHeaderAndError = errorLink.concat(linkWithHeader);
+
+	const splitLink = split(
+		({ query }) => {
+			const definition = getMainDefinition(query);
+			return (
+				definition.kind === "OperationDefinition" &&
+				definition.operation === "subscription"
+			);
+		},
+		errorLink.concat(wsLink),
+		linkWithHeaderAndError
+	);
+
 	const client = new ApolloClient({
 		//this is very very very important to write this way
 		//concat errorLink different way then concating with concat()
 		//it will occur error
 
-		link: errorLink.concat(linkWithHeader),
+		link: splitLink,
 		cache: new InMemoryCache(),
 	});
 	//not adding the logout on networkError 401 because

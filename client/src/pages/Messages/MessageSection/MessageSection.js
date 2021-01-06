@@ -1,21 +1,47 @@
 import React, { useState } from "react";
 import Loading from "../../../components/Loading";
 import useStyles from "./MessageSectionStyles";
-import { useMessageState } from "../../../context/message";
+import { useMessageState, useMessageDispatch } from "../../../context/message";
 import Message from "./Message";
 import { Fragment } from "react";
-import { Grid, IconButton } from "@material-ui/core";
+import { IconButton, Typography } from "@material-ui/core";
 import ImageIcon from "@material-ui/icons/Image";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import SendIcon from "@material-ui/icons/Send";
 import MaterialTooltip from "../../../components/Tooltip";
+import { useMutation } from "@apollo/client";
+import { SEND_MESSAGE } from "../../constants/GqlQueries";
 
 function MessageSection({ messagesLoading }) {
 	const [textAreaFocused, setTextAreaFocused] = useState(false);
+	const [content, setContent] = useState("");
+
 	const classes = useStyles();
+
 	const { users, selectedUser } = useMessageState();
+	const messageDispatch = useMessageDispatch();
+
 	const messagesData = users?.find((u) => u.username === selectedUser?.username)
 		?.messages;
+
+	const [sendMessage] = useMutation(SEND_MESSAGE, {
+		onError: (err) => console.log(err),
+		// onCompleted: (data) =>
+		// 	messageDispatch({
+		// 		type: "ADD_MESSAGE",
+		// 		payload: {
+		// 			username: selectedUser.username,
+		// 			message: data.sendMessage,
+		// 		},
+		// 	}),
+	});
+
+	const submitMessageHandler = (e) => {
+		e.preventDefault();
+		if (content.trim() === "") return;
+		setContent("");
+		sendMessage({ variables: { to: selectedUser.username, content } });
+	};
 
 	return (
 		<div className={classes.MessageSection}>
@@ -26,11 +52,10 @@ function MessageSection({ messagesLoading }) {
 			) : (
 				<>
 					<div className={classes.messageBox}>
-						{messagesData &&
-							messagesData.length > 0 &&
+						{messagesData?.length > 0 ? (
 							messagesData.map((message, index) => (
-								<Fragment>
-									<Message key={message.uuid} message={message} />
+								<Fragment key={message.uuid}>
+									<Message message={message} />
 
 									{/* {index === messagesData.length - 1 && (
 									<div className={classes.invisible}>
@@ -38,7 +63,19 @@ function MessageSection({ messagesLoading }) {
 									</div>
 								)} */}
 								</Fragment>
-							))}
+							))
+						) : (
+							<div
+								style={{
+									width: "100%",
+									marginBottom: "10px",
+									display: "flex",
+									justifyContent: "center",
+									color: "#666666",
+								}}>
+								<Typography variant='body2'>You are now connected!</Typography>
+							</div>
+						)}
 					</div>
 					<div className={classes.sendArea}>
 						<div
@@ -52,32 +89,44 @@ function MessageSection({ messagesLoading }) {
 								</MaterialTooltip>
 							)}
 							<MaterialTooltip title='Choose an emoji'>
-								<IconButton className={classes.sendAreaIcons}>
+								<IconButton
+									onClick={() => {}}
+									className={classes.sendAreaIcons}>
 									<EmojiEmotionsIcon />
 								</IconButton>
 							</MaterialTooltip>
 						</div>
-						<div className={classes.textArea}>
-							<form onSubmit=''>
+						<div
+							// style={{
+							// 	marginRight: !textAreaFocused ? "10px" : "0",
+							// }}
+							style={{ marginRight: "20px" }}
+							className={classes.textArea}>
+							<form onSubmit={submitMessageHandler}>
 								<input
 									type='text'
 									placeholder='Aa'
 									onFocus={() => setTextAreaFocused(true)}
 									onBlur={() => setTextAreaFocused(false)}
+									value={content}
+									onChange={(e) => setContent(e.target.value)}
 								/>
 							</form>
 						</div>
 
-						<div className={classes.sendButton}>
-							<MaterialTooltip title='Send the message'>
-								<IconButton
-									className={[classes.sendAreaIcons, classes.sendIcon].join(
-										" "
-									)}>
-									<SendIcon />
-								</IconButton>
-							</MaterialTooltip>
-						</div>
+						{/* {textAreaFocused && (
+							<div className={classes.sendButton}>
+								<MaterialTooltip title='Send the message'>
+									<IconButton
+										onClick={submitMessageHandler}
+										className={[classes.sendAreaIcons, classes.sendIcon].join(
+											" "
+										)}>
+										<SendIcon />
+									</IconButton>
+								</MaterialTooltip>
+							</div>
+						)} */}
 					</div>
 				</>
 			)}

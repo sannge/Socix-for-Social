@@ -102,7 +102,7 @@ function Login({ history }) {
 		},
 		onCompleted: (data) => {
 			dispatch({ type: "LOGIN", payload: data.login });
-			history.push("/");
+			window.location.href = "/";
 		},
 	});
 

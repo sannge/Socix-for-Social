@@ -42,14 +42,14 @@ const useStyles = makeStyles((theme) => ({
 	},
 	eachMessageContainer2: {
 		padding: "8px 12px",
-		borderRadius: "20px 20px 20px 30px",
+		borderRadius: "10px",
 		background: "rgb(0, 130, 255)",
 		color: "#f4f4f4",
 	},
 	eachMessageContainer2Other: {
 		background: "#ddd",
 		padding: "8px 12px",
-		borderRadius: "20px 20px 20px 20px",
+		borderRadius: "10px",
 	},
 	sendArea: {
 		display: "flex",
@@ -66,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
 	textArea: {
 		alignSelf: "center",
 		width: "100%",
+
 		"& input": {
 			boxSizing: "border-box",
 			width: "100%",
@@ -79,6 +80,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	sendIcon: {
 		marginLeft: "23px",
+		transition: "all .1s ease-in-out",
 	},
 }));
 

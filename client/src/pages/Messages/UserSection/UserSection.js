@@ -53,7 +53,9 @@ function UserSection({ timeOutputHandler, users }) {
 													noWrap>
 													{user.latestMessage?.from ===
 														authState.user.username && "You: "}
-													{user.latestMessage?.content}
+													{user.latestMessage && user.latestMessage.content
+														? user.latestMessage.content
+														: "You are now connected!"}
 												</Typography>
 											</div>
 											<div style={{ width: "40px" }}>

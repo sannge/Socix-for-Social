@@ -49,7 +49,7 @@ module.exports = {
 				});
 
 				//filter out the users that only have messaged at least once.
-				users = users.filter((user) => user.latestMessage !== undefined);
+				// users = users.filter((user) => user.latestMessage !== undefined);
 				// console.log("USERS: ", users);
 				return users;
 			} catch (err) {
