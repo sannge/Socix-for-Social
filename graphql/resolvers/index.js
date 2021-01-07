@@ -3,6 +3,7 @@ const messageResolvers = require("./MessageResolvers");
 const { Message, User } = require("../../models");
 
 module.exports = {
+	//Message resolver
 	Message: {
 		createdAt: (parent) => {
 			return parent.createdAt.toISOString();
@@ -12,8 +13,8 @@ module.exports = {
 		createdAt: (parent) => {
 			return parent.createdAt.toISOString();
 		},
-		Message: async (parent) => await Message.findByPk(parent.messageId),
-		User: async (parent) =>
+		message: async (parent) => await Message.findByPk(parent.messageId),
+		user: async (parent) =>
 			await User.findByPk(parent.userId, {
 				attributes: ["username", "imageUrl", "createdAt"],
 			}),
