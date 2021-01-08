@@ -79,9 +79,9 @@ function MessageSection({ messagesLoading }) {
 					</div>
 					<div className={classes.sendArea}>
 						<div
-							style={{ width: `${textAreaFocused ? "40px" : "85px"}` }}
+							// style={{ width: `${textAreaFocused ? "40px" : "85px"}` }}
 							className={classes.facility}>
-							{!textAreaFocused && (
+							{(
 								<MaterialTooltip title='Attach a photo or video'>
 									<IconButton className={classes.sendAreaIcons}>
 										<ImageIcon />

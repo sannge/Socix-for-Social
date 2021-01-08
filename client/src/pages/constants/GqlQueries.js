@@ -52,3 +52,13 @@ export const NEW_MESSAGE = gql`
 		}
 	}
 `;
+
+export const REACT_TO_MESSAGE = gql`
+	mutation reactToMessage($uuid: String!, $content: String!) {
+		reactToMessage(uuid: $uuid, content: $content) {
+			uuid
+			content
+			createdAt
+		}
+	}
+`;

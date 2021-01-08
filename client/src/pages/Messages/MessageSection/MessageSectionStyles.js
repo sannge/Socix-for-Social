@@ -28,6 +28,11 @@ const useStyles = makeStyles((theme) => ({
 			display: "none",
 		},
 	},
+	firstMessageContainer: {
+		display: "flex",
+		width: "100%",
+		justifyContent: "flex-end",
+	},
 	eachMessageContainer1: {
 		display: "flex",
 		margin: "5px 15px",
@@ -81,6 +86,20 @@ const useStyles = makeStyles((theme) => ({
 	sendIcon: {
 		marginLeft: "23px",
 		transition: "all .1s ease-in-out",
+	},
+	paper: {
+		borderRadius: "30px",
+		height: "38px",
+		alignItems: "center",
+	},
+	eachReaction: {
+		fontSize: "1.7rem",
+		padding: "3px",
+		cursor: "pointer",
+		transition: "font-size .25s ease-in-out",
+		"&:hover": {
+			fontSize: "2rem",
+		},
 	},
 }));
 
