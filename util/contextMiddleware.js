@@ -3,6 +3,7 @@ const { JWT_SECRET } = require("../config/env.json");
 const { AuthenticationError, PubSub } = require("apollo-server");
 
 const pubsub = new PubSub();
+pubsub.ee.setMaxListeners(30);
 
 module.exports = (context) => {
 	let token;

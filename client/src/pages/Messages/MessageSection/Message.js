@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useStyles from "./MessageSectionStyles";
-import { Typography, Popover, IconButton } from "@material-ui/core";
+import { Typography, Popover } from "@material-ui/core";
 import { useAuthState } from "../../../context/auth";
+import { useMessageDispatch } from "../../../context/message";
 import MaterialTooltip from "../../../components/Tooltip";
 import moment from "moment";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import { useMutation } from "@apollo/client";
-import { REACT_TO_MESSAGE } from "../../constants/GqlQueries";
+import { useMutation, useSubscription } from "@apollo/client";
+import { REACT_TO_MESSAGE, NEW_REACTION } from "../../constants/GqlQueries";
 
 const reactions = ["❤️", "😆", "😯", "😢", "😡", "👍", "👎"];
 
@@ -14,14 +15,21 @@ function Index({ message }) {
 	const [showOptions, setShowOptions] = useState(null);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const { user } = useAuthState();
+	const messageDispatch = useMessageDispatch();
 
 	const sent = message.from === user.username;
 	const received = !sent;
+
+	const reaectionIcons = [...new Set(message.reactions.map((r) => r.content))];
 
 	const [reactToMessage] = useMutation(REACT_TO_MESSAGE, {
 		onError: (err) => console.log(err),
 		onCompleted: (data) => console.log(data),
 	});
+
+	const { data: reactionData, error: reactionError } = useSubscription(
+		NEW_REACTION
+	);
 	//style
 	const classes = useStyles();
 
@@ -36,7 +44,11 @@ function Index({ message }) {
 		setShowOptions(false);
 	};
 
-	const react = (reaction) => {};
+	const react = (reaction) => {
+		reactToMessage({ variables: { uuid: message.uuid, content: reaction } });
+		setAnchorEl(null);
+		setShowOptions(false);
+	};
 
 	const reactButton = (
 		<div
@@ -50,6 +62,23 @@ function Index({ message }) {
 			<InsertEmoticonIcon style={{ opacity: ".2" }} />
 		</div>
 	);
+
+	useEffect(() => {
+		if (reactionError) {
+			console.log(reactionError);
+		}
+		if (reactionData) {
+			const reaction = reactionData.newReaction;
+			const otherUser =
+				user.username === reaction.message.to
+					? reaction.message.from
+					: reaction.message.to;
+			messageDispatch({
+				type: "ADD_REACTION",
+				payload: { username: otherUser, reaction },
+			});
+		}
+	}, [reactionError, reactionData]);
 
 	return (
 		<div
@@ -70,6 +99,12 @@ function Index({ message }) {
 							? classes.eachMessageContainer2
 							: classes.eachMessageContainer2Other
 					}>
+					{message.reactions.length > 0 && (
+						<div style={{ color: "#777777" }} className={classes.emojiPlace}>
+							{reaectionIcons}
+							{message.reactions.length}
+						</div>
+					)}
 					<MaterialTooltip
 						title={moment(message.createdAt).format("MMMM DD, YYYY, h:mm a")}
 						placement={sent ? "left" : "right"}>

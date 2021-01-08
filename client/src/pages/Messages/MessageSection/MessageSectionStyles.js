@@ -50,11 +50,13 @@ const useStyles = makeStyles((theme) => ({
 		borderRadius: "10px",
 		background: "rgb(0, 130, 255)",
 		color: "#f4f4f4",
+		position: "relative",
 	},
 	eachMessageContainer2Other: {
 		background: "#ddd",
 		padding: "8px 12px",
 		borderRadius: "10px",
+		position: "relative",
 	},
 	sendArea: {
 		display: "flex",
@@ -100,6 +102,16 @@ const useStyles = makeStyles((theme) => ({
 		"&:hover": {
 			fontSize: "2rem",
 		},
+	},
+	emojiPlace: {
+		background: "white",
+		borderRadius: "30px",
+		paddingLeft: "2px",
+		paddingRight: "2px",
+		position: "absolute",
+		bottom: "-18px",
+		right: "-10px",
+		fontSize: ".9rem",
 	},
 }));
 

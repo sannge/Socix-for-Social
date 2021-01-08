@@ -25,6 +25,10 @@ export const GET_MESSAGES = gql`
 			to
 			content
 			createdAt
+			reactions {
+				uuid
+				content
+			}
 		}
 	}
 `;
@@ -59,6 +63,20 @@ export const REACT_TO_MESSAGE = gql`
 			uuid
 			content
 			createdAt
+		}
+	}
+`;
+
+export const NEW_REACTION = gql`
+	subscription newReaction {
+		newReaction {
+			uuid
+			content
+			message {
+				uuid
+				from
+				to
+			}
 		}
 	}
 `;
