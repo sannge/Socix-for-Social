@@ -73,7 +73,6 @@ const useStyles = makeStyles((theme) => ({
 	textArea: {
 		alignSelf: "center",
 		width: "100%",
-
 		"& input": {
 			boxSizing: "border-box",
 			width: "100%",
@@ -105,13 +104,18 @@ const useStyles = makeStyles((theme) => ({
 	},
 	emojiPlace: {
 		background: "white",
-		borderRadius: "30px",
-		paddingLeft: "2px",
-		paddingRight: "2px",
+		borderRadius: "20px",
+		paddingLeft: "3px",
+		paddingRight: "3px",
 		position: "absolute",
-		bottom: "-18px",
+		bottom: "-13px",
 		right: "-10px",
 		fontSize: ".9rem",
+	},
+	emojiPicker: {
+		position: "absolute",
+		bottom: "65px",
+		left: "100px",
 	},
 }));
 

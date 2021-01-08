@@ -1,25 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Loading from "../../../components/Loading";
 import useStyles from "./MessageSectionStyles";
-import { useMessageState, useMessageDispatch } from "../../../context/message";
+import { useMessageState } from "../../../context/message";
 import Message from "./Message";
 import { Fragment } from "react";
-import { IconButton, Typography } from "@material-ui/core";
+import { IconButton, Typography, Popover } from "@material-ui/core";
 import ImageIcon from "@material-ui/icons/Image";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
-import SendIcon from "@material-ui/icons/Send";
 import MaterialTooltip from "../../../components/Tooltip";
 import { useMutation } from "@apollo/client";
 import { SEND_MESSAGE } from "../../constants/GqlQueries";
+import EmojiPicker from "../../../components/EmojiPicker";
 
 function MessageSection({ messagesLoading }) {
-	const [textAreaFocused, setTextAreaFocused] = useState(false);
+	// const [textAreaFocused, setTextAreaFocused] = useState(false);
 	const [content, setContent] = useState("");
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [cur, setCur] = useState(0);
+
+	const open = Boolean(anchorEl);
 
 	const classes = useStyles();
 
 	const { users, selectedUser } = useMessageState();
-	const messageDispatch = useMessageDispatch();
+
+	const inputRef = useRef(null);
 
 	const messagesData = users?.find((u) => u.username === selectedUser?.username)
 		?.messages;
@@ -36,11 +41,37 @@ function MessageSection({ messagesLoading }) {
 		// 	}),
 	});
 
+	useEffect(() => {
+		console.log("triggered");
+		inputRef.current.selectionEnd = cur;
+	}, [setCur, cur]);
+
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
 		if (content.trim() === "") return;
 		setContent("");
 		sendMessage({ variables: { to: selectedUser.username, content } });
+	};
+
+	const emojiHandler = (e) => {
+		inputRef.current.focus();
+		console.log(inputRef.current);
+		setAnchorEl(e.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const onEmojiClick = (e, { emoji }) => {
+		e.preventDefault();
+		const ref = inputRef.current;
+		console.log(ref.selectionStart, ref.selectionEnd);
+		const start = content.substring(0, ref.selectionStart);
+		const end = content.substring(ref.selectionStart);
+		const text = start + emoji + end;
+		setContent(text);
+		setCur(start.length + emoji.length);
 	};
 
 	return (
@@ -77,20 +108,35 @@ function MessageSection({ messagesLoading }) {
 							</div>
 						)}
 					</div>
+					{/* {showEmojis && ( */}
+					<Popover
+						open={open}
+						anchorEl={anchorEl}
+						onClose={handleClose}
+						anchorOrigin={{
+							vertical: "top",
+							horizontal: "left",
+						}}
+						transformOrigin={{
+							vertical: "bottom",
+							horizontal: "center",
+						}}
+						classes={{ paper: classes.emojiPicker }}>
+						<EmojiPicker pickEmoji={onEmojiClick} />
+					</Popover>
+					{/* )} */}
 					<div className={classes.sendArea}>
-						<div
-							// style={{ width: `${textAreaFocused ? "40px" : "85px"}` }}
-							className={classes.facility}>
-							{(
+						<div className={classes.facility}>
+							{
 								<MaterialTooltip title='Attach a photo or video'>
 									<IconButton className={classes.sendAreaIcons}>
 										<ImageIcon />
 									</IconButton>
 								</MaterialTooltip>
-							)}
+							}
 							<MaterialTooltip title='Choose an emoji'>
 								<IconButton
-									onClick={() => {}}
+									onClick={(e) => emojiHandler(e)}
 									className={classes.sendAreaIcons}>
 									<EmojiEmotionsIcon />
 								</IconButton>
@@ -104,10 +150,11 @@ function MessageSection({ messagesLoading }) {
 							className={classes.textArea}>
 							<form onSubmit={submitMessageHandler}>
 								<input
+									ref={inputRef}
 									type='text'
 									placeholder='Aa'
-									onFocus={() => setTextAreaFocused(true)}
-									onBlur={() => setTextAreaFocused(false)}
+									// onFocus={() => setTextAreaFocused(true)}
+									// onBlur={() => setTextAreaFocused(false)}
 									value={content}
 									onChange={(e) => setContent(e.target.value)}
 								/>
