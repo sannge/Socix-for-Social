@@ -6,11 +6,20 @@ module.exports = {
 	//Message resolver
 	Message: {
 		createdAt: (parent) => {
-			return parent.createdAt.toISOString();
+			// console.log(
+			// 	"Message PARENT.CREATEDAT: ",
+			// 	parent.createdAt,
+			// 	parent.createdAt.toISOString()
+			// );
+			if (typeof parent.createdAt !== "string") {
+				return parent.createdAt.toISOString();
+			}
+			return parent.createdAt;
 		},
 	},
 	Reaction: {
 		createdAt: (parent) => {
+			console.log("PARENT.CREATEDAT: ", parent.createdAt);
 			return parent.createdAt.toISOString();
 		},
 		message: async (parent) => await Message.findByPk(parent.messageId),

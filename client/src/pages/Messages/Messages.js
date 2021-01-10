@@ -29,8 +29,6 @@ function Messages() {
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
 
-	console.log("just got: ", selectedUser);
-
 	const { data: newMessageData, error: newMessageError } = useSubscription(
 		NEW_MESSAGE
 	);

@@ -68,6 +68,7 @@ function Index({ message }) {
 			console.log(reactionError);
 		}
 		if (reactionData) {
+			console.log(reactionData.newReaction);
 			const reaction = reactionData.newReaction;
 			const otherUser =
 				user.username === reaction.message.to

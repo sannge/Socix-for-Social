@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
 	Message.init(
 		{
 			content: {
-				type: DataTypes.STRING,
+				type: DataTypes.TEXT("long"),
 				allowNull: false,
 			},
 			uuid: {

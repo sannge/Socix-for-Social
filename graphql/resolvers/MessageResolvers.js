@@ -74,7 +74,6 @@ module.exports = {
 				});
 
 				pubsub.publish("NEW_MESSAGE", { newMessage: message });
-
 				return message;
 			} catch (err) {
 				console.log(err);
@@ -118,7 +117,8 @@ module.exports = {
 						content,
 					});
 				}
-				pubsub.publish("NEW_REACTION", { newReaction: reaction });
+				// console.log("FROM reactTOMessage: ", pubsub, reaction.toJSON());
+				pubsub.publish("REACTION_SUB", { newReaction: reaction.toJSON() });
 				return reaction;
 			} catch (err) {
 				throw err;
@@ -149,15 +149,27 @@ module.exports = {
 		newReaction: {
 			subscribe: withFilter(
 				(_, __, { user, pubsub }) => {
-					if (!user) throw new AuthenticationError("Unauthenticated");
-					return pubsub.asyncIterator(["NEW_REACTION"]);
+					if (!user) {
+						throw new AuthenticationError("Unauthenticated");
+					}
+					return pubsub.asyncIterator(["REACTION_SUB"]);
 				},
 				async ({ newReaction }, _, { user }) => {
-					const message = await newReaction.getMessage();
-					if (message.from === user.username || message.to === user.username) {
-						return true;
+					try {
+						const message = await Message.findOne({
+							where: { id: newReaction.messageId },
+						});
+
+						if (
+							message.from === user.username ||
+							message.to === user.username
+						) {
+							return true;
+						}
+						return false;
+					} catch (err) {
+						console.log(err);
 					}
-					return false;
 				}
 			),
 		},

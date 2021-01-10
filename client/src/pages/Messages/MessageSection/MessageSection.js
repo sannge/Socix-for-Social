@@ -4,13 +4,15 @@ import useStyles from "./MessageSectionStyles";
 import { useMessageState } from "../../../context/message";
 import Message from "./Message";
 import { Fragment } from "react";
-import { IconButton, Typography, Popover } from "@material-ui/core";
+import { IconButton, Typography, Popover, InputBase } from "@material-ui/core";
 import ImageIcon from "@material-ui/icons/Image";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import MaterialTooltip from "../../../components/Tooltip";
 import { useMutation } from "@apollo/client";
 import { SEND_MESSAGE } from "../../constants/GqlQueries";
 import EmojiPicker from "../../../components/EmojiPicker";
+import SendIcon from "@material-ui/icons/Send";
+import moment from "moment";
 
 function MessageSection({ messagesLoading }) {
 	// const [textAreaFocused, setTextAreaFocused] = useState(false);
@@ -25,6 +27,7 @@ function MessageSection({ messagesLoading }) {
 	const { users, selectedUser } = useMessageState();
 
 	const inputRef = useRef(null);
+	const submitRef = useRef(null);
 
 	const messagesData = users?.find((u) => u.username === selectedUser?.username)
 		?.messages;
@@ -42,7 +45,6 @@ function MessageSection({ messagesLoading }) {
 	});
 
 	useEffect(() => {
-		console.log("triggered");
 		inputRef.current.selectionEnd = cur;
 	}, [setCur, cur]);
 
@@ -55,7 +57,6 @@ function MessageSection({ messagesLoading }) {
 
 	const emojiHandler = (e) => {
 		inputRef.current.focus();
-		console.log(inputRef.current);
 		setAnchorEl(e.currentTarget);
 	};
 
@@ -65,13 +66,23 @@ function MessageSection({ messagesLoading }) {
 
 	const onEmojiClick = (e, { emoji }) => {
 		e.preventDefault();
-		const ref = inputRef.current;
-		console.log(ref.selectionStart, ref.selectionEnd);
+		//for selecting textarea
+		const ref = inputRef.current.children[0];
 		const start = content.substring(0, ref.selectionStart);
 		const end = content.substring(ref.selectionStart);
 		const text = start + emoji + end;
 		setContent(text);
 		setCur(start.length + emoji.length);
+	};
+
+	const handleKeyDown = (e) => {
+		if (e.which === 13) {
+			e.preventDefault();
+			const textArea = inputRef.current.children[0];
+			textArea.style.height = "auto"; //<------resize text area
+			submitRef.current.click();
+			console.log(submitRef.current);
+		}
 	};
 
 	return (
@@ -93,6 +104,11 @@ function MessageSection({ messagesLoading }) {
 										<hr style={{ margin: "0", color: "white" }} />
 									</div>
 								)} */}
+									{index === messagesData.length - 1 && (
+										<div>
+											{moment(message.createdAt).format("MM/DD/YYYY, h:mm a")}
+										</div>
+									)}
 								</Fragment>
 							))
 						) : (
@@ -125,55 +141,61 @@ function MessageSection({ messagesLoading }) {
 						<EmojiPicker pickEmoji={onEmojiClick} />
 					</Popover>
 					{/* )} */}
-					<div className={classes.sendArea}>
-						<div className={classes.facility}>
-							{
-								<MaterialTooltip title='Attach a photo or video'>
-									<IconButton className={classes.sendAreaIcons}>
-										<ImageIcon />
-									</IconButton>
-								</MaterialTooltip>
-							}
-							<MaterialTooltip title='Choose an emoji'>
-								<IconButton
-									onClick={(e) => emojiHandler(e)}
-									className={classes.sendAreaIcons}>
-									<EmojiEmotionsIcon />
-								</IconButton>
-							</MaterialTooltip>
-						</div>
-						<div
-							// style={{
-							// 	marginRight: !textAreaFocused ? "10px" : "0",
-							// }}
-							style={{ marginRight: "20px" }}
-							className={classes.textArea}>
-							<form onSubmit={submitMessageHandler}>
-								<input
-									ref={inputRef}
-									type='text'
-									placeholder='Aa'
-									// onFocus={() => setTextAreaFocused(true)}
-									// onBlur={() => setTextAreaFocused(false)}
-									value={content}
-									onChange={(e) => setContent(e.target.value)}
-								/>
-							</form>
-						</div>
-
-						{/* {textAreaFocused && (
-							<div className={classes.sendButton}>
-								<MaterialTooltip title='Send the message'>
+					<div className={classes.sendAreaContainer}>
+						<div className={classes.sendArea}>
+							<div className={classes.facility}>
+								{
+									<MaterialTooltip title='Attach a photo or video'>
+										<IconButton className={classes.sendAreaIcons}>
+											<ImageIcon />
+										</IconButton>
+									</MaterialTooltip>
+								}
+								<MaterialTooltip title='Choose an emoji'>
 									<IconButton
-										onClick={submitMessageHandler}
-										className={[classes.sendAreaIcons, classes.sendIcon].join(
-											" "
-										)}>
-										<SendIcon />
+										onClick={(e) => emojiHandler(e)}
+										className={classes.sendAreaIcons}>
+										<EmojiEmotionsIcon />
 									</IconButton>
 								</MaterialTooltip>
 							</div>
-						)} */}
+							<div
+								// style={{
+								// 	marginRight: !textAreaFocused ? "10px" : "0",
+								// }}
+								style={{ marginRight: "20px" }}
+								className={classes.textArea}>
+								<form onSubmit={submitMessageHandler}>
+									<InputBase
+										onKeyDown={handleKeyDown}
+										className={classes.textInputBase}
+										multiline
+										ref={inputRef}
+										type='text'
+										placeholder='Aa'
+										// onFocus={() => setTextAreaFocused(true)}
+										// onBlur={() => setTextAreaFocused(false)}
+										value={content}
+										onChange={(e) => setContent(e.target.value)}
+									/>
+								</form>
+							</div>
+
+							{
+								<div className={classes.sendButton}>
+									<MaterialTooltip title='Send the message'>
+										<IconButton
+											ref={submitRef}
+											onClick={submitMessageHandler}
+											className={[classes.sendAreaIcons, classes.sendIcon].join(
+												" "
+											)}>
+											<SendIcon />
+										</IconButton>
+									</MaterialTooltip>
+								</div>
+							}
+						</div>
 					</div>
 				</>
 			)}

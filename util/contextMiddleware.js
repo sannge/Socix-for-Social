@@ -1,9 +1,24 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config/env.json");
-const { AuthenticationError, PubSub } = require("apollo-server");
+const { AuthenticationError } = require("apollo-server");
+const { RedisPubSub } = require("graphql-redis-subscriptions");
+const { PubSub } = require("apollo-server");
+//For Production
 
-const pubsub = new PubSub();
-pubsub.ee.setMaxListeners(30);
+const Redis = require("ioredis");
+
+const options = {
+	host: "127.0.0.1",
+	port: "6379",
+	retry_strategy: (options) => {
+		return Math.max(options.attempt * 100, 3000);
+	},
+};
+
+const pubsub = new RedisPubSub({
+	publisher: new Redis(options),
+	subscriber: new Redis(options),
+});
 
 module.exports = (context) => {
 	let token;
