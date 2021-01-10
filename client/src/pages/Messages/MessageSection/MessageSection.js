@@ -81,7 +81,6 @@ function MessageSection({ messagesLoading }) {
 			const textArea = inputRef.current.children[0];
 			textArea.style.height = "auto"; //<------resize text area
 			submitRef.current.click();
-			console.log(submitRef.current);
 		}
 	};
 
