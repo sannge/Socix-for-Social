@@ -43,10 +43,12 @@ module.exports = gql`
 		): User!
 		sendMessage(to: String!, content: String!): Message!
 		reactToMessage(uuid: String!, content: String!): Reaction!
+		userTyping(to: String!): Boolean
 	}
 
 	type Subscription {
 		newMessage: Message!
 		newReaction: Reaction!
+		userTyping: String
 	}
 `;

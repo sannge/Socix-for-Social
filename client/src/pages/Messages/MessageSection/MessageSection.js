@@ -8,16 +8,22 @@ import { IconButton, Typography, Popover, InputBase } from "@material-ui/core";
 import ImageIcon from "@material-ui/icons/Image";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import MaterialTooltip from "../../../components/Tooltip";
-import { useMutation } from "@apollo/client";
-import { SEND_MESSAGE } from "../../constants/GqlQueries";
+import { useMutation, useSubscription } from "@apollo/client";
+import {
+	SEND_MESSAGE,
+	USER_TYPING,
+	USER_TYPING_SUB,
+} from "../../constants/GqlQueries";
 import EmojiPicker from "../../../components/EmojiPicker";
 import SendIcon from "@material-ui/icons/Send";
 import moment from "moment";
+import TypingIndicator from "../../../components/TypingIndicator";
 
 function MessageSection({ messagesLoading }) {
 	// const [textAreaFocused, setTextAreaFocused] = useState(false);
 	const [content, setContent] = useState("");
 	const [anchorEl, setAnchorEl] = useState(null);
+	const [showTyping, setShowTyping] = useState(false);
 	const [cur, setCur] = useState(0);
 
 	const open = Boolean(anchorEl);
@@ -44,9 +50,24 @@ function MessageSection({ messagesLoading }) {
 		// 	}),
 	});
 
+	const [userTyping] = useMutation(USER_TYPING);
+
+	const { data: typing, error: typingError } = useSubscription(USER_TYPING_SUB);
+
 	useEffect(() => {
 		inputRef.current.selectionEnd = cur;
 	}, [setCur, cur]);
+
+	useEffect(() => {
+		console.log(typing);
+		let time = null;
+		if (typing) {
+			console.log("Typing");
+			setShowTyping(true);
+			time = setTimeout(() => setShowTyping(false), 2000);
+		}
+		return () => clearTimeout(time);
+	}, [typing, typingError]);
 
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
@@ -84,6 +105,12 @@ function MessageSection({ messagesLoading }) {
 		}
 	};
 
+	const callTypingIndicator = () => {
+		if (content.length !== 0 && content.length % 5 === 0) {
+			userTyping({ variables: { to: selectedUser.username } });
+		}
+	};
+
 	return (
 		<div className={classes.MessageSection}>
 			{messagesLoading ? (
@@ -93,6 +120,18 @@ function MessageSection({ messagesLoading }) {
 			) : (
 				<>
 					<div className={classes.messageBox}>
+						{showTyping && (
+							<div className={classes.firstMessageContainer}>
+								<div className={classes.eachMessageContainer1Other}>
+									<div className={classes.eachMessageContainer2Other}>
+										<div className={classes.typingIndicator}>
+											<TypingIndicator />
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
+
 						{messagesData?.length > 0 ? (
 							messagesData.map((message, index) => (
 								<Fragment key={message.uuid}>
@@ -103,13 +142,7 @@ function MessageSection({ messagesLoading }) {
 										<hr style={{ margin: "0", color: "white" }} />
 									</div>
 								)} */}
-									{console.log(
-										messagesData[index + 1] &&
-											(new Date(message.createdAt) -
-												new Date(messagesData[index + 1].createdAt)) /
-												1000 /
-												60
-									)}
+
 									{(index === messagesData.length - 1 ||
 										(messagesData[index + 1] &&
 											(new Date(message.createdAt) -
@@ -135,6 +168,7 @@ function MessageSection({ messagesLoading }) {
 							</div>
 						)}
 					</div>
+
 					{/* {showEmojis && ( */}
 					<Popover
 						open={open}
@@ -152,6 +186,7 @@ function MessageSection({ messagesLoading }) {
 						<EmojiPicker pickEmoji={onEmojiClick} />
 					</Popover>
 					{/* )} */}
+
 					<div className={classes.sendAreaContainer}>
 						<div className={classes.sendArea}>
 							<div className={classes.facility}>
@@ -187,7 +222,10 @@ function MessageSection({ messagesLoading }) {
 										// onFocus={() => setTextAreaFocused(true)}
 										// onBlur={() => setTextAreaFocused(false)}
 										value={content}
-										onChange={(e) => setContent(e.target.value)}
+										onChange={(e) => {
+											setContent(e.target.value);
+											callTypingIndicator();
+										}}
 									/>
 								</form>
 							</div>
@@ -208,6 +246,7 @@ function MessageSection({ messagesLoading }) {
 							}
 						</div>
 					</div>
+					<div className={classes.fillArea}></div>
 				</>
 			)}
 		</div>

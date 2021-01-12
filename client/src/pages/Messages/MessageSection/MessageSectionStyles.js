@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	messageBox: {
 		paddingBottom: "7px",
-		height: "93%",
+		height: "88%",
 		display: "flex",
 		flexDirection: "column-reverse",
 		overflowY: "scroll",
@@ -62,18 +62,19 @@ const useStyles = makeStyles((theme) => ({
 	sendAreaContainer: {
 		position: "relative",
 		width: "100%",
+		paddingBottom: "10px",
 	},
 	sendArea: {
-		background: "red",
 		display: "flex",
 		// alignItems: "center",
-		position: "absolute",
-		bottom: "-50px",
+		// position: "absolute",
+		// bottom: "-50px",
 		width: "100%",
 		maxHeight: "100px",
 		background: "white",
 		paddingTop: "5px",
 		alignItems: "flex-end",
+		zIndex: "1000",
 	},
 	facility: {
 		width: "85px",
@@ -155,6 +156,15 @@ const useStyles = makeStyles((theme) => ({
 		paddingBottom: "13px",
 		fontSize: ".8rem",
 		color: "#666",
+	},
+	fillArea: {
+		zIndex: "1000000000",
+		height: "80px",
+		background: "#eee",
+		width: "110%",
+		marginLeft: "-10px",
+		padding: 0,
+		margin: 0,
 	},
 }));
 

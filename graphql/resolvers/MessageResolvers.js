@@ -124,6 +124,14 @@ module.exports = {
 				throw err;
 			}
 		},
+		userTyping: (_, { to }, { user, pubsub }) => {
+			if (!user) {
+				throw new AuthenticationError("Unauthenticated");
+			}
+			pubsub.publish("USER_TYPING", { userTyping: to });
+
+			return true;
+		},
 	},
 
 	Subscription: {
@@ -169,6 +177,25 @@ module.exports = {
 						return false;
 					} catch (err) {
 						console.log(err);
+					}
+				}
+			),
+		},
+
+		userTyping: {
+			subscribe: withFilter(
+				(_, __, { user, pubsub }) => {
+					if (!user) {
+						throw new AuthenticationError("Unauthenticated");
+					}
+					return pubsub.asyncIterator(["USER_TYPING"]);
+				},
+				({ userTyping }, _, { user }) => {
+					if (userTyping === user.username) {
+						console.log(userTyping);
+						return true;
+					} else {
+						return false;
 					}
 				}
 			),

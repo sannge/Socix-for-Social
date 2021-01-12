@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
 		borderTop: "none",
 		borderBottom: "none",
 		width: "90px",
-		height: "87vh",
+		height: "84vh",
 		minWidth: "100px",
 		display: "flex",
 		flexFlow: "column",

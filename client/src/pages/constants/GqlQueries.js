@@ -80,3 +80,15 @@ export const NEW_REACTION = gql`
 		}
 	}
 `;
+
+export const USER_TYPING = gql`
+	mutation userTyping($to: String!) {
+		userTyping(to: $to)
+	}
+`;
+
+export const USER_TYPING_SUB = gql`
+	subscription userTyping {
+		userTyping
+	}
+`;
