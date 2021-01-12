@@ -16,10 +16,18 @@ import moment from "moment";
 import TypingIndicator from "../../../components/TypingIndicator";
 import { useAuthState } from "../../../context/auth";
 
-function MessageSection({ messagesLoading, showTyping, userTyping, typing }) {
+function MessageSection({
+	messagesLoading,
+	showTyping,
+	userTyping,
+	typing,
+	newMessageData,
+}) {
 	// const [textAreaFocused, setTextAreaFocused] = useState(false);
 	const [content, setContent] = useState("");
 	const [anchorEl, setAnchorEl] = useState(null);
+
+	const lastMessageRef = useRef(null);
 
 	const [cur, setCur] = useState(0);
 
@@ -28,6 +36,8 @@ function MessageSection({ messagesLoading, showTyping, userTyping, typing }) {
 	const classes = useStyles();
 
 	const { users, selectedUser } = useMessageState();
+	console.log(users);
+
 	const { user } = useAuthState();
 
 	const inputRef = useRef(null);
@@ -55,6 +65,30 @@ function MessageSection({ messagesLoading, showTyping, userTyping, typing }) {
 	useEffect(() => {
 		setContent("");
 	}, [selectedUser]);
+
+	useEffect(() => {
+		let time = null;
+		if (
+			(newMessageData?.newMessage?.from === selectedUser?.username ||
+				newMessageData?.newMessage?.to === selectedUser?.username) &&
+			lastMessageRef.current
+		) {
+			time = setTimeout(() => {
+				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
+			}, 200);
+		}
+		return () => clearTimeout(time);
+	}, [newMessageData]);
+
+	useEffect(() => {
+		let time = null;
+		if (typing?.userTyping.from === selectedUser?.username) {
+			time = setTimeout(() => {
+				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
+			}, 100);
+		}
+		return () => clearTimeout(time);
+	}, [typing]);
 
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
@@ -108,7 +142,7 @@ function MessageSection({ messagesLoading, showTyping, userTyping, typing }) {
 				</div>
 			) : (
 				<>
-					<div className={classes.messageBox}>
+					<div ref={lastMessageRef} className={classes.messageBox}>
 						{showTyping && selectedUser.username === typing.userTyping.from && (
 							<div className={classes.firstMessageContainer}>
 								<div className={classes.eachMessageContainer1Other}>

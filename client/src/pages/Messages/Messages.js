@@ -123,11 +123,7 @@ function Messages() {
 
 	const timeOutputHandler = (date) => {
 		const timeSoFar = new Date() - new Date(date);
-		if (timeSoFar / 1000 < 1) {
-			return " · 1s";
-		} else if (timeSoFar / (1000 * 60) < 1) {
-			return ` · ${Math.ceil(timeSoFar / 1000)}s`;
-		} else if (timeSoFar / (1000 * 60 * 60) < 1) {
+		if (timeSoFar / (1000 * 60 * 60) < 1) {
 			return ` · ${Math.ceil(timeSoFar / (1000 * 60))}m`;
 		} else if (timeSoFar / (1000 * 60 * 60 * 24) < 1) {
 			return ` . ${Math.ceil(timeSoFar / (1000 * 60 * 60))}h`;
@@ -179,6 +175,7 @@ function Messages() {
 							showTyping={showTyping}
 							messagesLoading={messagesLoading}
 							typing={typing}
+							newMessageData={newMessageData}
 						/>
 					</div>
 				)}
