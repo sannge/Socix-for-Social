@@ -124,11 +124,12 @@ module.exports = {
 				throw err;
 			}
 		},
-		userTyping: (_, { to }, { user, pubsub }) => {
+		userTyping: (_, { from, to }, { user, pubsub }) => {
 			if (!user) {
 				throw new AuthenticationError("Unauthenticated");
 			}
-			pubsub.publish("USER_TYPING", { userTyping: to });
+
+			pubsub.publish("USER_TYPING", { userTyping: { from, to } });
 
 			return true;
 		},
@@ -191,8 +192,8 @@ module.exports = {
 					return pubsub.asyncIterator(["USER_TYPING"]);
 				},
 				({ userTyping }, _, { user }) => {
-					if (userTyping === user.username) {
-						console.log(userTyping);
+					if (userTyping.to === user.username) {
+						console.log(userTyping.to, user.username);
 						return true;
 					} else {
 						return false;

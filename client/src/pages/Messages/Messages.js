@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { GET_USERS, GET_MESSAGES, NEW_MESSAGE } from "../constants/GqlQueries";
-import { useQuery, useLazyQuery, useSubscription } from "@apollo/client";
+import {
+	GET_USERS,
+	GET_MESSAGES,
+	NEW_MESSAGE,
+	USER_TYPING,
+	USER_TYPING_SUB,
+} from "../constants/GqlQueries";
+import {
+	useQuery,
+	useLazyQuery,
+	useSubscription,
+	useMutation,
+} from "@apollo/client";
 import ErrorComponent from "../../components/Error";
 import { Container } from "@material-ui/core";
 import Loading from "../../components/Loading";
@@ -14,6 +25,8 @@ import { useAuthState } from "../../context/auth";
 function Messages() {
 	const messageDispatch = useMessageDispatch();
 	const { users, selectedUser } = useMessageState();
+
+	const [showTyping, setShowTyping] = useState(false);
 
 	const { user } = useAuthState();
 
@@ -33,11 +46,20 @@ function Messages() {
 		NEW_MESSAGE
 	);
 
+	const [userTyping] = useMutation(USER_TYPING, {
+		onError: (error) => console.log(error),
+	});
+
+	const { data: typing, error: typingError } = useSubscription(USER_TYPING_SUB);
+
 	useEffect(() => {
 		if (newMessageError) {
 			console.log(newMessageError);
 		}
 		if (newMessageData) {
+			if (newMessageData.newMessage.from === selectedUser.username) {
+				setShowTyping(false);
+			}
 			console.log("newMessageData: ", newMessageData.newMessage.content);
 			const otherUser =
 				user.username === newMessageData.newMessage.to
@@ -89,6 +111,16 @@ function Messages() {
 		window.addEventListener("resize", showlatestMessageHandler);
 	}, []);
 
+	useEffect(() => {
+		let time = null;
+		if (typing) {
+			console.log(typing);
+			setShowTyping(true);
+			time = setTimeout(() => setShowTyping(false), 2000);
+		}
+		return () => clearTimeout(time);
+	}, [typing, typingError]);
+
 	const timeOutputHandler = (date) => {
 		const timeSoFar = new Date() - new Date(date);
 		if (timeSoFar / 1000 < 1) {
@@ -137,7 +169,12 @@ function Messages() {
 					// styling the getUsers section like messenger
 					<div className={classes.messagesContainer} style={{ width: "100%" }}>
 						<UserSection users={users} timeOutputHandler={timeOutputHandler} />
-						<MessageSection messagesLoading={messagesLoading} />
+						<MessageSection
+							userTyping={userTyping}
+							showTyping={showTyping}
+							messagesLoading={messagesLoading}
+							typing={typing}
+						/>
 					</div>
 				)}
 			</Container>

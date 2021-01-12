@@ -28,6 +28,11 @@ module.exports = gql`
 		user: User!
 	}
 
+	type UserTypingDetails {
+		from: String!
+		to: String!
+	}
+
 	type Query {
 		getUsers: [User]!
 		login(email: String!, password: String!): User!
@@ -43,12 +48,12 @@ module.exports = gql`
 		): User!
 		sendMessage(to: String!, content: String!): Message!
 		reactToMessage(uuid: String!, content: String!): Reaction!
-		userTyping(to: String!): Boolean
+		userTyping(from: String!, to: String!): Boolean
 	}
 
 	type Subscription {
 		newMessage: Message!
 		newReaction: Reaction!
-		userTyping: String
+		userTyping: UserTypingDetails
 	}
 `;

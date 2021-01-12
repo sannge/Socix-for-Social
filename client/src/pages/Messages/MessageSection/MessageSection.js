@@ -8,22 +8,19 @@ import { IconButton, Typography, Popover, InputBase } from "@material-ui/core";
 import ImageIcon from "@material-ui/icons/Image";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import MaterialTooltip from "../../../components/Tooltip";
-import { useMutation, useSubscription } from "@apollo/client";
-import {
-	SEND_MESSAGE,
-	USER_TYPING,
-	USER_TYPING_SUB,
-} from "../../constants/GqlQueries";
+import { useMutation } from "@apollo/client";
+import { SEND_MESSAGE } from "../../constants/GqlQueries";
 import EmojiPicker from "../../../components/EmojiPicker";
 import SendIcon from "@material-ui/icons/Send";
 import moment from "moment";
 import TypingIndicator from "../../../components/TypingIndicator";
+import { useAuthState } from "../../../context/auth";
 
-function MessageSection({ messagesLoading }) {
+function MessageSection({ messagesLoading, showTyping, userTyping, typing }) {
 	// const [textAreaFocused, setTextAreaFocused] = useState(false);
 	const [content, setContent] = useState("");
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [showTyping, setShowTyping] = useState(false);
+
 	const [cur, setCur] = useState(0);
 
 	const open = Boolean(anchorEl);
@@ -31,6 +28,7 @@ function MessageSection({ messagesLoading }) {
 	const classes = useStyles();
 
 	const { users, selectedUser } = useMessageState();
+	const { user } = useAuthState();
 
 	const inputRef = useRef(null);
 	const submitRef = useRef(null);
@@ -50,24 +48,13 @@ function MessageSection({ messagesLoading }) {
 		// 	}),
 	});
 
-	const [userTyping] = useMutation(USER_TYPING);
-
-	const { data: typing, error: typingError } = useSubscription(USER_TYPING_SUB);
-
 	useEffect(() => {
 		inputRef.current.selectionEnd = cur;
 	}, [setCur, cur]);
 
 	useEffect(() => {
-		console.log(typing);
-		let time = null;
-		if (typing) {
-			console.log("Typing");
-			setShowTyping(true);
-			time = setTimeout(() => setShowTyping(false), 2000);
-		}
-		return () => clearTimeout(time);
-	}, [typing, typingError]);
+		setContent("");
+	}, [selectedUser]);
 
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
@@ -107,7 +94,9 @@ function MessageSection({ messagesLoading }) {
 
 	const callTypingIndicator = () => {
 		if (content.length !== 0 && content.length % 5 === 0) {
-			userTyping({ variables: { to: selectedUser.username } });
+			userTyping({
+				variables: { from: user.username, to: selectedUser.username },
+			});
 		}
 	};
 
@@ -120,7 +109,7 @@ function MessageSection({ messagesLoading }) {
 			) : (
 				<>
 					<div className={classes.messageBox}>
-						{showTyping && (
+						{showTyping && selectedUser.username === typing.userTyping.from && (
 							<div className={classes.firstMessageContainer}>
 								<div className={classes.eachMessageContainer1Other}>
 									<div className={classes.eachMessageContainer2Other}>
