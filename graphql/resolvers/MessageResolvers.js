@@ -193,7 +193,6 @@ module.exports = {
 				},
 				({ userTyping }, _, { user }) => {
 					if (userTyping.to === user.username) {
-						console.log(userTyping.to, user.username);
 						return true;
 					} else {
 						return false;

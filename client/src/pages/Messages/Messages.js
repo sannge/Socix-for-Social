@@ -168,7 +168,12 @@ function Messages() {
 				) : (
 					// styling the getUsers section like messenger
 					<div className={classes.messagesContainer} style={{ width: "100%" }}>
-						<UserSection users={users} timeOutputHandler={timeOutputHandler} />
+						<UserSection
+							showTyping={showTyping}
+							typing={typing}
+							users={users}
+							timeOutputHandler={timeOutputHandler}
+						/>
 						<MessageSection
 							userTyping={userTyping}
 							showTyping={showTyping}
