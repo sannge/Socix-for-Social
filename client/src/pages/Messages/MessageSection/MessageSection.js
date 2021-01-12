@@ -103,8 +103,20 @@ function MessageSection({ messagesLoading }) {
 										<hr style={{ margin: "0", color: "white" }} />
 									</div>
 								)} */}
-									{index === messagesData.length - 1 && (
-										<div>
+									{console.log(
+										messagesData[index + 1] &&
+											(new Date(message.createdAt) -
+												new Date(messagesData[index + 1].createdAt)) /
+												1000 /
+												60
+									)}
+									{(index === messagesData.length - 1 ||
+										(messagesData[index + 1] &&
+											(new Date(message.createdAt) -
+												new Date(messagesData[index + 1].createdAt)) /
+												1000 /
+												60) > 60) && (
+										<div className={classes.apartDate}>
 											{moment(message.createdAt).format("MM/DD/YYYY, h:mm a")}
 										</div>
 									)}

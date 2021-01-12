@@ -147,6 +147,15 @@ const useStyles = makeStyles((theme) => ({
 		bottom: "65px",
 		left: "100px",
 	},
+	apartDate: {
+		width: "100%",
+		display: "flex",
+		justifyContent: "center",
+		paddingTop: "25px",
+		paddingBottom: "13px",
+		fontSize: ".8rem",
+		color: "#666",
+	},
 }));
 
 export default useStyles;
