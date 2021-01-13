@@ -121,8 +121,8 @@ const useStyles = makeStyles((theme) => ({
 	},
 	paper: {
 		borderRadius: "30px",
-		height: "38px",
 		alignItems: "center",
+		maxHeight: '300px',
 	},
 	eachReaction: {
 		fontSize: "1.7rem",
@@ -147,6 +147,7 @@ const useStyles = makeStyles((theme) => ({
 		position: "absolute",
 		bottom: "65px",
 		left: "100px",
+		maxHeight: '300px',
 	},
 	apartDate: {
 		width: "100%",

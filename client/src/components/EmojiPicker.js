@@ -5,7 +5,8 @@ import React from "react";
 const useStyles = makeStyles((theme) => ({
 	container: {
 		width: "100%",
-		maxHeight: "100%",
+		// maxHeight: "27px",
+		height: '150%',
 		overflowY: "auto",
 		backgroundColor: "white",
 		borderRadius: "10px",
