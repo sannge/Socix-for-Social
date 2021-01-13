@@ -5,6 +5,7 @@ import {
 	NEW_MESSAGE,
 	USER_TYPING,
 	USER_TYPING_SUB,
+	NEW_REACTION
 } from "../constants/GqlQueries";
 import {
 	useQuery,
@@ -36,16 +37,20 @@ function Messages() {
 
 	const { loading, error } = useQuery(GET_USERS, {
 		onCompleted: (data) => {
-			messageDispatch({ type: "SET_USERS", payload: data.getUsers });
+			if(!users) {
+				messageDispatch({ type: "SET_USERS", payload: data.getUsers });
+			}
 		},
 	});
+
+	
 	//fetches from network maybe later fix for network cost
 	const [
 		getMessages,
 		{ loading: messagesLoading, data: messagesData },
 	] = useLazyQuery(GET_MESSAGES, {
 		// notifyOnNetworkStatusChange: true,
-		fetchPolicy: "no-cache",
+		fetchPolicy: "cache-and-network",
 	});
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
@@ -54,11 +59,34 @@ function Messages() {
 		NEW_MESSAGE
 	);
 
+	const { data: reactionData, error: reactionError } = useSubscription(
+		NEW_REACTION
+	);
+
 	const [userTyping] = useMutation(USER_TYPING, {
 		onError: (error) => console.log(error),
 	});
 
 	const { data: typing, error: typingError } = useSubscription(USER_TYPING_SUB);
+
+	useEffect(() => {
+		if (reactionError) {
+			console.log(reactionError);
+		}
+		else if (reactionData) {
+			console.log("reactionData: ",reactionData.newReaction);
+			const reaction = reactionData.newReaction;
+			const otherUser =
+				user.username === reaction.message.to
+					? reaction.message.from
+					: reaction.message.to;
+			messageDispatch({
+				type: "ADD_REACTION",
+				payload: { username: otherUser, reaction },
+			});
+		}
+	}, [reactionError, reactionData]);
+
 
 	useEffect(() => {
 		if (newMessageError) {
@@ -94,12 +122,19 @@ function Messages() {
 
 	useEffect(() => {
 		if (selectedUser && selectedUser.username) {
-			// if(!users[selectedUserIndex].messages) {
 
 			getMessages({ variables: { from: selectedUser.username } });
-			// }
+		
 		}
-	}, [selectedUser]);
+		else if(users && users[0]) {
+			messageDispatch({
+							type: "SET_SELECTED_USER",
+							payload: users[0].username,
+						});
+		}
+	}, [selectedUser || users]);
+
+	
 
 	useEffect(() => {
 		if (messagesData) {

@@ -6,8 +6,8 @@ import { useMessageDispatch } from "../../../context/message";
 import MaterialTooltip from "../../../components/Tooltip";
 import moment from "moment";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import { useMutation, useSubscription } from "@apollo/client";
-import { REACT_TO_MESSAGE, NEW_REACTION } from "../../constants/GqlQueries";
+import { useMutation } from "@apollo/client";
+import { REACT_TO_MESSAGE } from "../../constants/GqlQueries";
 
 const reactions = ["❤️", "😆", "😯", "😢", "😡", "👍", "👎"];
 
@@ -27,9 +27,6 @@ function Index({ message }) {
 		onCompleted: (data) => console.log(data),
 	});
 
-	const { data: reactionData, error: reactionError } = useSubscription(
-		NEW_REACTION
-	);
 	//style
 	const classes = useStyles();
 
@@ -62,24 +59,6 @@ function Index({ message }) {
 			<InsertEmoticonIcon style={{ opacity: ".2" }} />
 		</div>
 	);
-
-	useEffect(() => {
-		if (reactionError) {
-			console.log(reactionError);
-		}
-		if (reactionData) {
-			console.log(reactionData.newReaction);
-			const reaction = reactionData.newReaction;
-			const otherUser =
-				user.username === reaction.message.to
-					? reaction.message.from
-					: reaction.message.to;
-			messageDispatch({
-				type: "ADD_REACTION",
-				payload: { username: otherUser, reaction },
-			});
-		}
-	}, [reactionError, reactionData]);
 
 	return (
 		<div

@@ -15,6 +15,7 @@ const messageReducer = (state, action) => {
 				previewUser.previewContent = ""
 				previewUsers.push(previewUser);
 			}
+			console.log("BEING CALLED");
 			return {
 				...state,
 				users: previewUsers,
