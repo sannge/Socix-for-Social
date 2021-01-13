@@ -26,6 +26,10 @@ function Messages() {
 	const messageDispatch = useMessageDispatch();
 	const { users, selectedUser } = useMessageState();
 
+	const selectedUserIndex = users?.findIndex(
+		(u) => u.username === selectedUser?.username
+	);
+
 	const [showTyping, setShowTyping] = useState(false);
 
 	const { user } = useAuthState();
@@ -35,10 +39,14 @@ function Messages() {
 			messageDispatch({ type: "SET_USERS", payload: data.getUsers });
 		},
 	});
+	//fetches from network maybe later fix for network cost
 	const [
 		getMessages,
 		{ loading: messagesLoading, data: messagesData },
-	] = useLazyQuery(GET_MESSAGES);
+	] = useLazyQuery(GET_MESSAGES, {
+		// notifyOnNetworkStatusChange: true,
+		fetchPolicy: "no-cache",
+	});
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
 
@@ -57,7 +65,7 @@ function Messages() {
 			console.log(newMessageError);
 		}
 		if (newMessageData) {
-			if (newMessageData.newMessage.from === selectedUser.username) {
+			if (newMessageData.newMessage.from === selectedUser?.username) {
 				setShowTyping(false);
 			}
 			console.log("newMessageData: ", newMessageData.newMessage.content);
@@ -75,25 +83,31 @@ function Messages() {
 		}
 	}, [newMessageData, newMessageError]);
 
+	// useEffect(() => {
+	// 	if (users && users[0]) {
+	// 		messageDispatch({
+	// 			type: "SET_SELECTED_USER",
+	// 			payload: users[0].username,
+	// 		});
+	// 	}
+	// }, [users]);
+
 	useEffect(() => {
 		if (selectedUser && selectedUser.username) {
+			// if(!users[selectedUserIndex].messages) {
+
 			getMessages({ variables: { from: selectedUser.username } });
-		} else {
-			if (users && users[0]) {
-				messageDispatch({
-					type: "SET_SELECTED_USER",
-					payload: users[0].username,
-				});
-			}
+			// }
 		}
-	}, [selectedUser, users]);
+	}, [selectedUser]);
 
 	useEffect(() => {
 		if (messagesData) {
+			console.log("MESSAGES DATA: ", messagesData);
 			messageDispatch({
 				type: "SET_USER_MESSAGES",
 				payload: {
-					username: selectedUser?.username,
+					username: selectedUser.username,
 					messages: messagesData.getMessages,
 				},
 			});
@@ -114,7 +128,6 @@ function Messages() {
 	useEffect(() => {
 		let time = null;
 		if (typing) {
-			console.log(typing);
 			setShowTyping(true);
 			time = setTimeout(() => setShowTyping(false), 2000);
 		}

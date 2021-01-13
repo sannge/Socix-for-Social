@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Loading from "../../../components/Loading";
 import useStyles from "./MessageSectionStyles";
-import { useMessageState,useMessageDispatch } from "../../../context/message";
+import { useMessageState, useMessageDispatch } from "../../../context/message";
 import Message from "./Message";
 import { Fragment } from "react";
 import { IconButton, Typography, Popover, InputBase } from "@material-ui/core";
@@ -36,11 +36,11 @@ function MessageSection({
 
 	const { users, selectedUser } = useMessageState();
 
-	const selectedUserIndex = users?.findIndex(u => u.username === selectedUser?.username);
-	
-	const messageDispath = useMessageDispatch();
+	const selectedUserIndex = users?.findIndex(
+		(u) => u.username === selectedUser?.username
+	);
 
-	console.log(users);
+	const messageDispath = useMessageDispatch();
 
 	const { user } = useAuthState();
 
@@ -63,7 +63,7 @@ function MessageSection({
 	});
 
 	useEffect(() => {
-		if(inputRef.current) {
+		if (inputRef.current) {
 			inputRef.current.selectionEnd = cur;
 		}
 	}, [setCur, cur]);
@@ -73,7 +73,8 @@ function MessageSection({
 		if (
 			(newMessageData?.newMessage?.from === selectedUser?.username ||
 				newMessageData?.newMessage?.to === selectedUser?.username) &&
-			lastMessageRef.current && lastMessageRef.current.scrollTop 
+			lastMessageRef.current &&
+			lastMessageRef.current.scrollTop
 		) {
 			time = setTimeout(() => {
 				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
@@ -84,7 +85,11 @@ function MessageSection({
 
 	useEffect(() => {
 		let time = null;
-		if (typing?.userTyping.from === selectedUser?.username && lastMessageRef.current && lastMessageRef.current.scrollTop ) {
+		if (
+			typing?.userTyping.from === selectedUser?.username &&
+			lastMessageRef.current &&
+			lastMessageRef.current.scrollTop
+		) {
 			time = setTimeout(() => {
 				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
 			}, 100);
@@ -95,8 +100,19 @@ function MessageSection({
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
 		if (users[selectedUserIndex].previewContent.trim() === "") return;
-		messageDispath({type:"CLEAR_PREVIEWCONTENT",payload: {index: selectedUserIndex, previewContent: users[selectedUserIndex].previewContent}})
-		sendMessage({ variables: { to: selectedUser.username, content: users[selectedUserIndex].previewContent } });
+		messageDispath({
+			type: "CLEAR_PREVIEWCONTENT",
+			payload: {
+				index: selectedUserIndex,
+				previewContent: users[selectedUserIndex].previewContent,
+			},
+		});
+		sendMessage({
+			variables: {
+				to: selectedUser.username,
+				content: users[selectedUserIndex].previewContent,
+			},
+		});
 	};
 
 	const emojiHandler = (e) => {
@@ -112,10 +128,18 @@ function MessageSection({
 		e.preventDefault();
 		//for selecting textarea
 		const ref = inputRef.current.children[0];
-		const start = users[selectedUserIndex].previewContent.substring(0, ref.selectionStart);
-		const end = users[selectedUserIndex].previewContent.substring(ref.selectionStart);
+		const start = users[selectedUserIndex].previewContent.substring(
+			0,
+			ref.selectionStart
+		);
+		const end = users[selectedUserIndex].previewContent.substring(
+			ref.selectionStart
+		);
 		const text = start + emoji + end;
-		messageDispath({type: 'SET_PREVIEWCONTENT',payload: {selectedUser, previewContent: text}})
+		messageDispath({
+			type: "SET_PREVIEWCONTENT",
+			payload: { selectedUser, previewContent: text },
+		});
 		setCur(start.length + emoji.length);
 	};
 
@@ -129,7 +153,10 @@ function MessageSection({
 	};
 
 	const callTypingIndicator = () => {
-		if (users[selectedUserIndex].previewContent.length !== 0 && users[selectedUserIndex].previewContent.length % 5 === 0) {
+		if (
+			users[selectedUserIndex].previewContent.length !== 0 &&
+			users[selectedUserIndex].previewContent.length % 5 === 0
+		) {
 			userTyping({
 				variables: { from: user.username, to: selectedUser.username },
 			});
@@ -145,7 +172,7 @@ function MessageSection({
 			) : (
 				<>
 					<div ref={lastMessageRef} className={classes.messageBox}>
-						{showTyping && selectedUser.username === typing.userTyping.from && (
+						{showTyping && selectedUser?.username === typing.userTyping.from && (
 							<div className={classes.firstMessageContainer}>
 								<div className={classes.eachMessageContainer1Other}>
 									<div className={classes.eachMessageContainer2Other}>
@@ -236,23 +263,31 @@ function MessageSection({
 								// }}
 								style={{ marginRight: "20px" }}
 								className={classes.textArea}>
-								{users && users[selectedUserIndex] && <form onSubmit={submitMessageHandler}>
-									<InputBase
-										onKeyDown={handleKeyDown}
-										className={classes.textInputBase}
-										multiline
-										ref={inputRef}
-										type='text'
-										placeholder='Aa'
-										// onFocus={() => setTextAreaFocused(true)}
-										// onBlur={() => setTextAreaFocused(false)}
-										value={users[selectedUserIndex].previewContent}
-										onChange={(e) => {
-											messageDispath({type:"SET_PREVIEWCONTENT",payload: {selectedUser, previewContent: e.target.value}})
-											callTypingIndicator();
-										}}
-									/>
-								</form>}
+								{users && users[selectedUserIndex] && (
+									<form onSubmit={submitMessageHandler}>
+										<InputBase
+											onKeyDown={handleKeyDown}
+											className={classes.textInputBase}
+											multiline
+											ref={inputRef}
+											type='text'
+											placeholder='Aa'
+											// onFocus={() => setTextAreaFocused(true)}
+											// onBlur={() => setTextAreaFocused(false)}
+											value={users[selectedUserIndex].previewContent}
+											onChange={(e) => {
+												messageDispath({
+													type: "SET_PREVIEWCONTENT",
+													payload: {
+														selectedUser,
+														previewContent: e.target.value,
+													},
+												});
+												callTypingIndicator();
+											}}
+										/>
+									</form>
+								)}
 							</div>
 
 							{
