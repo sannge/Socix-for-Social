@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Loading from "../../../components/Loading";
 import useStyles from "./MessageSectionStyles";
-import { useMessageState } from "../../../context/message";
+import { useMessageState,useMessageDispatch } from "../../../context/message";
 import Message from "./Message";
 import { Fragment } from "react";
 import { IconButton, Typography, Popover, InputBase } from "@material-ui/core";
@@ -24,7 +24,6 @@ function MessageSection({
 	newMessageData,
 }) {
 	// const [textAreaFocused, setTextAreaFocused] = useState(false);
-	const [content, setContent] = useState("");
 	const [anchorEl, setAnchorEl] = useState(null);
 
 	const lastMessageRef = useRef(null);
@@ -36,6 +35,11 @@ function MessageSection({
 	const classes = useStyles();
 
 	const { users, selectedUser } = useMessageState();
+
+	const selectedUserIndex = users?.findIndex(u => u.username === selectedUser?.username);
+	
+	const messageDispath = useMessageDispatch();
+
 	console.log(users);
 
 	const { user } = useAuthState();
@@ -59,19 +63,17 @@ function MessageSection({
 	});
 
 	useEffect(() => {
-		inputRef.current.selectionEnd = cur;
+		if(inputRef.current) {
+			inputRef.current.selectionEnd = cur;
+		}
 	}, [setCur, cur]);
-
-	useEffect(() => {
-		setContent("");
-	}, [selectedUser]);
 
 	useEffect(() => {
 		let time = null;
 		if (
 			(newMessageData?.newMessage?.from === selectedUser?.username ||
 				newMessageData?.newMessage?.to === selectedUser?.username) &&
-			lastMessageRef.current
+			lastMessageRef.current && lastMessageRef.current.scrollTop 
 		) {
 			time = setTimeout(() => {
 				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
@@ -82,7 +84,7 @@ function MessageSection({
 
 	useEffect(() => {
 		let time = null;
-		if (typing?.userTyping.from === selectedUser?.username) {
+		if (typing?.userTyping.from === selectedUser?.username && lastMessageRef.current && lastMessageRef.current.scrollTop ) {
 			time = setTimeout(() => {
 				lastMessageRef.current.scrollTop = lastMessageRef.current?.scrollHeight;
 			}, 100);
@@ -92,9 +94,9 @@ function MessageSection({
 
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
-		if (content.trim() === "") return;
-		setContent("");
-		sendMessage({ variables: { to: selectedUser.username, content } });
+		if (users[selectedUserIndex].previewContent.trim() === "") return;
+		messageDispath({type:"CLEAR_PREVIEWCONTENT",payload: {index: selectedUserIndex, previewContent: users[selectedUserIndex].previewContent}})
+		sendMessage({ variables: { to: selectedUser.username, content: users[selectedUserIndex].previewContent } });
 	};
 
 	const emojiHandler = (e) => {
@@ -110,10 +112,10 @@ function MessageSection({
 		e.preventDefault();
 		//for selecting textarea
 		const ref = inputRef.current.children[0];
-		const start = content.substring(0, ref.selectionStart);
-		const end = content.substring(ref.selectionStart);
+		const start = users[selectedUserIndex].previewContent.substring(0, ref.selectionStart);
+		const end = users[selectedUserIndex].previewContent.substring(ref.selectionStart);
 		const text = start + emoji + end;
-		setContent(text);
+		messageDispath({type: 'SET_PREVIEWCONTENT',payload: {selectedUser, previewContent: text}})
 		setCur(start.length + emoji.length);
 	};
 
@@ -127,7 +129,7 @@ function MessageSection({
 	};
 
 	const callTypingIndicator = () => {
-		if (content.length !== 0 && content.length % 5 === 0) {
+		if (users[selectedUserIndex].previewContent.length !== 0 && users[selectedUserIndex].previewContent.length % 5 === 0) {
 			userTyping({
 				variables: { from: user.username, to: selectedUser.username },
 			});
@@ -234,7 +236,7 @@ function MessageSection({
 								// }}
 								style={{ marginRight: "20px" }}
 								className={classes.textArea}>
-								<form onSubmit={submitMessageHandler}>
+								{users && users[selectedUserIndex] && <form onSubmit={submitMessageHandler}>
 									<InputBase
 										onKeyDown={handleKeyDown}
 										className={classes.textInputBase}
@@ -244,13 +246,13 @@ function MessageSection({
 										placeholder='Aa'
 										// onFocus={() => setTextAreaFocused(true)}
 										// onBlur={() => setTextAreaFocused(false)}
-										value={content}
+										value={users[selectedUserIndex].previewContent}
 										onChange={(e) => {
-											setContent(e.target.value);
+											messageDispath({type:"SET_PREVIEWCONTENT",payload: {selectedUser, previewContent: e.target.value}})
 											callTypingIndicator();
 										}}
 									/>
-								</form>
+								</form>}
 							</div>
 
 							{

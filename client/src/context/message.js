@@ -5,14 +5,45 @@ const MessageDispatchContext = createContext();
 const messageReducer = (state, action) => {
 	//reducer actions
 	let usersCopy, userIndex;
-	const { username, message, messages, reaction } = action.payload;
+	const { username, message, messages, reaction, previewContent } = action.payload;
 
 	switch (action.type) {
 		case "SET_USERS":
+			let previewUsers = [];
+			for(let i = 0; i < action.payload.length;i++) {
+				let previewUser = {...action.payload[i]};
+				previewUser.previewContent = ""
+				previewUsers.push(previewUser);
+			}
 			return {
 				...state,
-				users: action.payload,
+				users: previewUsers,
 			};
+		
+		case "SET_PREVIEWCONTENT": {
+			usersCopy = [...state.users];
+			let userCopyIndex = usersCopy.findIndex(u => u.username === state.selectedUser.username)
+			let userCopy = {...usersCopy[userCopyIndex]};
+			userCopy.previewContent = previewContent;
+			usersCopy[userCopyIndex] = {...userCopy};
+			return {
+				...state,
+				users: usersCopy,
+			}
+		};
+
+		case "CLEAR_PREVIEWCONTENT": {
+			usersCopy = [...state.users];
+			let userCopy = {...usersCopy[action.payload.index]};
+			userCopy.previewContent = "";
+			usersCopy[action.payload.index] = userCopy;
+			
+			return {
+				...state,
+				users: usersCopy,
+			}
+		}
+
 		case "SET_SELECTED_USER": {
 			usersCopy = state.users.map((user) => ({
 				...user,
