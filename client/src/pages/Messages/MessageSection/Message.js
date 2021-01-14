@@ -32,7 +32,7 @@ function Index({ message }) {
 	});
 
 	//style
-	const classes = useStyles();
+	const classes = useStyles(sent);
 
 	const open = Boolean(anchorEl);
 
@@ -81,57 +81,58 @@ function Index({ message }) {
 			onMouseEnter={() => setShowOptions(true)}
 			onMouseLeave={() => setShowOptions(false)}>
 			<div
-				style={{
-					display: "flex",
-					flexFlow: "column",
-					justifyContent: "center",
-				}}
+				style={{ display: "flex", alignItems: "center" }}
 				className={
 					sent
 						? classes.eachMessageContainer1
 						: classes.eachMessageContainer1Other
 				}>
-				{sent && reactButton}
-				<div
-					ref={eachMessageContainer2Ref}
-					className={
-						sent
-							? classes.eachMessageContainer2
-							: classes.eachMessageContainer2Other
-					}>
-					{message.reactions.length > 0 && (
-						<div style={{ color: "#777777" }} className={classes.emojiPlace}>
-							{reactionIcons}
-							{message.reactions.length}
+				{sent && <div>{reactButton}</div>}
+				<div>
+					<div
+						ref={eachMessageContainer2Ref}
+						className={
+							sent
+								? classes.eachMessageContainer2
+								: classes.eachMessageContainer2Other
+						}>
+						{message.reactions.length > 0 && (
+							<div style={{ color: "#777777" }} className={classes.emojiPlace}>
+								{reactionIcons}
+								{message.reactions.length}
+							</div>
+						)}
+						<MaterialTooltip
+							title={moment(message.createdAt).format("MMMM DD, YYYY, h:mm a")}
+							placement={sent ? "left" : "right"}>
+							<Typography variant='body1' component='p'>
+								<Linkify>
+									<div
+										ref={messageContentAnchorRef}
+										className={
+											sent ? classes.styleAnchor : classes.styleAnchorOther
+										}>
+										{message.content}
+									</div>
+								</Linkify>
+							</Typography>
+						</MaterialTooltip>
+					</div>
+
+					{anchor && (
+						<div className={classes.media}>
+							<ReactTinyLink
+								cardSize='small'
+								showGraphic={true}
+								maxLine={2}
+								onError={() => setAnchor(false)}
+								minLine={1}
+								url={anchor}
+							/>
 						</div>
 					)}
-					<MaterialTooltip
-						title={moment(message.createdAt).format("MMMM DD, YYYY, h:mm a")}
-						placement={sent ? "left" : "right"}>
-						<Typography variant='body1' component='p'>
-							<Linkify>
-								<div
-									ref={messageContentAnchorRef}
-									className={classes.styleAnchor}>
-									{message.content}
-								</div>
-							</Linkify>
-						</Typography>
-					</MaterialTooltip>
 				</div>
-				{received && reactButton}
-				{anchor && (
-					<div>
-						<ReactTinyLink
-							cardSize='small'
-							showGraphic={true}
-							maxLine={2}
-							onError={() => setAnchor(false)}
-							minLine={1}
-							url={anchor}
-						/>
-					</div>
-				)}
+				{received && <div>{reactButton}</div>}
 			</div>
 
 			<Popover

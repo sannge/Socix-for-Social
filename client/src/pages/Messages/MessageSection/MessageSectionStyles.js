@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
 		display: "flex",
 		margin: "5px 15px",
 		marginRight: "auto",
-		maxWidth: "70%",
+		maxWidth: "60%",
 		wordBreak: "break-word",
 	},
 	eachMessageContainer2: {
@@ -55,12 +55,15 @@ const useStyles = makeStyles((theme) => ({
 		background: "rgb(0, 130, 255)",
 		color: "#f4f4f4",
 		position: "relative",
+		fontWeight: "100",
 	},
 	eachMessageContainer2Other: {
-		background: "#ddd",
+		background: "rgba(232, 235, 233,0.7)",
 		padding: "8px 12px",
+		fontWeight: "lighter",
 		borderRadius: "10px 10px 5px 5px",
 		position: "relative",
+		color: "#242424",
 	},
 	sendAreaContainer: {
 		position: "relative",
@@ -73,11 +76,14 @@ const useStyles = makeStyles((theme) => ({
 			textDecoration: "underlined",
 		},
 	},
+	styleAnchorOther: {
+		"& a": {
+			color: "rgb(0, 130, 255)",
+			textDecoration: "underlined",
+		},
+	},
 	sendArea: {
 		display: "flex",
-		// alignItems: "center",
-		// position: "absolute",
-		// bottom: "-50px",
 		width: "100%",
 		maxHeight: "100px",
 		background: "white",
@@ -98,17 +104,6 @@ const useStyles = makeStyles((theme) => ({
 		width: "100%",
 		position: "relative",
 		height: "100%",
-		// "& > div": {
-		// 	display: "inline-block",
-		// 	boxSizing: "border-box",
-		// 	width: "100%",
-		// 	border: "none",
-		// 	background: "#eee",
-		// 	padding: "10px 15px",
-		// 	marginLeft: "15px",
-		// 	outline: "none",
-		// 	borderRadius: "20px",
-		// },
 	},
 	textInputBase: {
 		display: "inline-block",
@@ -176,6 +171,9 @@ const useStyles = makeStyles((theme) => ({
 		marginLeft: "-10px",
 		padding: 0,
 		margin: 0,
+	},
+	media: {
+		paddingBottom: "25px",
 	},
 }));
 
