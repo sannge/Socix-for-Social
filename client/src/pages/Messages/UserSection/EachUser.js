@@ -1,4 +1,5 @@
 import React from "react";
+import LastMessageTimeView from './LastMessageTimeView';
 
 function EachUser({
 	messageDispatch,
@@ -65,7 +66,7 @@ function EachUser({
 										{showTyping && typing.userTyping.from === user.username
 											? ""
 											: user.latestMessage &&
-											  timeOutputHandler(user.latestMessage.createdAt)}
+											 <LastMessageTimeView  timeOutputHandler={timeOutputHandler} timeOutput={user.latestMessage.createdAt}/>}
 									</Typography>
 								</div>
 							</div>
