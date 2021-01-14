@@ -123,6 +123,11 @@ function Login({ history }) {
 				</Typography> */}
 				<form onSubmit={submitLoginForm} className={classes.form}>
 					<TextField
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitLoginForm(e);
+							}
+						}}
 						variant='outlined'
 						margin='normal'
 						fullWidth
@@ -152,6 +157,11 @@ function Login({ history }) {
 						label={
 							errors.password && variables.password === "" ? "" : "Password"
 						}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitLoginForm(e);
+							}
+						}}
 						name='password'
 						type='password'
 						helperText={errors.password}

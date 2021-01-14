@@ -128,6 +128,11 @@ function Register(props) {
 				</Typography> */}
 				<form onSubmit={submitRegisterForm} className={classes.form}>
 					<TextField
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitRegisterForm(e);
+							}
+						}}
 						variant='outlined'
 						margin='normal'
 						fullWidth
@@ -148,6 +153,11 @@ function Register(props) {
 						value={variables.username}
 					/>
 					<TextField
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitRegisterForm(e);
+							}
+						}}
 						variant='outlined'
 						margin='normal'
 						fullWidth
@@ -167,6 +177,11 @@ function Register(props) {
 						value={variables.email}
 					/>
 					<TextField
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitRegisterForm(e);
+							}
+						}}
 						variant='outlined'
 						margin='normal'
 						fullWidth
@@ -186,6 +201,11 @@ function Register(props) {
 						value={variables.password}
 					/>
 					<TextField
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								submitRegisterForm(e);
+							}
+						}}
 						variant='outlined'
 						margin='normal'
 						fullWidth
