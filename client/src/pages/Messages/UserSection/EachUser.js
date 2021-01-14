@@ -17,10 +17,14 @@ function EachUser({
 	return (
 		<div
 			onClick={() =>
-				messageDispatch({
-					type: "SET_SELECTED_USER",
-					payload: user.username,
-				})
+				{
+					if(user.username !== selectedUser.username) {
+						messageDispatch({
+							type: "SET_SELECTED_USER",
+							payload: user.username,
+						})
+					}
+				}
 			}>
 			<div className={classes.userContainer}>
 				<div

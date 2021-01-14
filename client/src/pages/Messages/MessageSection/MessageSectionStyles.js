@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	messagesLoadingContainer: {
 		display: "flex",
-		height: "75vh",
+		height: "77.33vh",
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 		display: "flex",
 		flexDirection: "column-reverse",
 		overflowY: "scroll",
+		overflowX: "hidden",
 		scrollbarWidth: "none",
 		"&::-webkit-scrollbar": {
 			display: "none",
@@ -38,17 +39,19 @@ const useStyles = makeStyles((theme) => ({
 		display: "flex",
 		margin: "5px 15px",
 		marginLeft: "auto",
-		maxWidth: "70%",
+		maxWidth: "60%",
+		wordBreak: "break-word",
 	},
 	eachMessageContainer1Other: {
 		display: "flex",
 		margin: "5px 15px",
 		marginRight: "auto",
 		maxWidth: "70%",
+		wordBreak: "break-word",
 	},
 	eachMessageContainer2: {
 		padding: "8px 12px",
-		borderRadius: "10px",
+		borderRadius: "10px 10px 5px 5px",
 		background: "rgb(0, 130, 255)",
 		color: "#f4f4f4",
 		position: "relative",
@@ -56,13 +59,19 @@ const useStyles = makeStyles((theme) => ({
 	eachMessageContainer2Other: {
 		background: "#ddd",
 		padding: "8px 12px",
-		borderRadius: "10px",
+		borderRadius: "10px 10px 5px 5px",
 		position: "relative",
 	},
 	sendAreaContainer: {
 		position: "relative",
 		width: "100%",
 		paddingBottom: "10px",
+	},
+	styleAnchor: {
+		"& a": {
+			color: "white",
+			textDecoration: "underlined",
+		},
 	},
 	sendArea: {
 		display: "flex",
@@ -122,7 +131,7 @@ const useStyles = makeStyles((theme) => ({
 	paper: {
 		borderRadius: "30px",
 		alignItems: "center",
-		maxHeight: '300px',
+		maxHeight: "300px",
 	},
 	eachReaction: {
 		fontSize: "1.7rem",
@@ -142,12 +151,13 @@ const useStyles = makeStyles((theme) => ({
 		bottom: "-13px",
 		right: "-10px",
 		fontSize: ".9rem",
+		zIndex: "1",
 	},
 	emojiPicker: {
 		position: "absolute",
 		bottom: "65px",
 		left: "100px",
-		maxHeight: '300px',
+		maxHeight: "300px",
 	},
 	apartDate: {
 		width: "100%",

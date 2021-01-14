@@ -239,7 +239,10 @@ function MessageSection({
 					</Popover>
 					{/* )} */}
 
-					<div className={classes.sendAreaContainer}>
+					
+				</>
+			)}
+			<div className={classes.sendAreaContainer}>
 						<div className={classes.sendArea}>
 							<div className={classes.facility}>
 								{
@@ -307,8 +310,6 @@ function MessageSection({
 						</div>
 					</div>
 					<div className={classes.fillArea}></div>
-				</>
-			)}
 		</div>
 	);
 }
