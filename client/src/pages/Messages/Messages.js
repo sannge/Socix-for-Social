@@ -5,7 +5,7 @@ import {
 	NEW_MESSAGE,
 	USER_TYPING,
 	USER_TYPING_SUB,
-	NEW_REACTION
+	NEW_REACTION,
 } from "../constants/GqlQueries";
 import {
 	useQuery,
@@ -37,13 +37,12 @@ function Messages() {
 
 	const { loading, error } = useQuery(GET_USERS, {
 		onCompleted: (data) => {
-			if(!users) {
+			if (!users) {
 				messageDispatch({ type: "SET_USERS", payload: data.getUsers });
 			}
 		},
 	});
 
-	
 	//fetches from network maybe later fix for network cost
 	const [
 		getMessages,
@@ -72,9 +71,8 @@ function Messages() {
 	useEffect(() => {
 		if (reactionError) {
 			console.log(reactionError);
-		}
-		else if (reactionData) {
-			console.log("reactionData: ",reactionData.newReaction);
+		} else if (reactionData) {
+			console.log("reactionData: ", reactionData.newReaction);
 			const reaction = reactionData.newReaction;
 			const otherUser =
 				user.username === reaction.message.to
@@ -86,7 +84,6 @@ function Messages() {
 			});
 		}
 	}, [reactionError, reactionData]);
-
 
 	useEffect(() => {
 		if (newMessageError) {
@@ -122,19 +119,16 @@ function Messages() {
 
 	useEffect(() => {
 		if (selectedUser && selectedUser.username) {
-
-			getMessages({ variables: { from: selectedUser.username } });
-		
-		}
-		else if(users && users[0]) {
+			if (users && !users[selectedUserIndex].messages) {
+				getMessages({ variables: { from: selectedUser.username } });
+			}
+		} else if (users && users[0]) {
 			messageDispatch({
-							type: "SET_SELECTED_USER",
-							payload: users[0].username,
-						});
+				type: "SET_SELECTED_USER",
+				payload: users[0].username,
+			});
 		}
 	}, [selectedUser || users]);
-
-	
 
 	useEffect(() => {
 		if (messagesData) {
