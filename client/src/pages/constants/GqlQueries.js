@@ -29,18 +29,20 @@ export const GET_MESSAGES = gql`
 				uuid
 				content
 			}
+			pendingID
 		}
 	}
 `;
 
 export const SEND_MESSAGE = gql`
-	mutation sendMessage($to: String!, $content: String!) {
-		sendMessage(to: $to, content: $content) {
+	mutation sendMessage($to: String!, $content: String!, $pendingID: String!) {
+		sendMessage(to: $to, content: $content, pendingID: $pendingID) {
 			uuid
 			from
 			to
 			content
 			createdAt
+			pendingID
 		}
 	}
 `;
@@ -53,6 +55,7 @@ export const NEW_MESSAGE = gql`
 			to
 			content
 			createdAt
+			pendingID
 		}
 	}
 `;

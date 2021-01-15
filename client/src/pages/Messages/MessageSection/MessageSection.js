@@ -30,6 +30,10 @@ function MessageSection({
 
 	const [cur, setCur] = useState(0);
 
+	const [pendingMessages, setPendingMessages] = useState([]);
+	const [showRetry, setShowRetry] = useState(false);
+	const [failedMessages, setFailedMessages] = useState([]);
+
 	const open = Boolean(anchorEl);
 
 	const classes = useStyles();
@@ -50,17 +54,34 @@ function MessageSection({
 	const messagesData = users?.find((u) => u.username === selectedUser?.username)
 		?.messages;
 
-	const [sendMessage] = useMutation(SEND_MESSAGE, {
-		onError: (err) => console.log(err),
-		// onCompleted: (data) =>
-		// 	messageDispatch({
-		// 		type: "ADD_MESSAGE",
-		// 		payload: {
-		// 			username: selectedUser.username,
-		// 			message: data.sendMessage,
-		// 		},
-		// 	}),
-	});
+	const [sendMessage, { loading: sendMessageLoading }] = useMutation(
+		SEND_MESSAGE,
+		{
+			onError: (err) => {
+				console.log(err);
+				const copyPendingMessages = [...pendingMessages];
+				for (let i = 0; i < copyPendingMessages.length; i++) {
+					copyPendingMessages[i] = { ...copyPendingMessages[i] };
+				}
+				setFailedMessages(copyPendingMessages);
+				setShowRetry(true);
+			},
+			//Add a unique id like Date.now() or something so that we can match those two and delete the one from pending
+			onCompleted: (data) => {
+				const sentMessage = { ...data.sendMessage };
+
+				let copyPendingMessages = [...pendingMessages];
+
+				const sentMessageIndex = copyPendingMessages.findIndex(
+					(m) => m.pendingID === sentMessage.pendingID
+				);
+				console.log(copyPendingMessages);
+				copyPendingMessages.splice(sentMessageIndex, 1);
+				console.log(copyPendingMessages);
+				setPendingMessages(copyPendingMessages);
+			},
+		}
+	);
 
 	useEffect(() => {
 		if (inputRef.current) {
@@ -100,6 +121,25 @@ function MessageSection({
 	const submitMessageHandler = (e) => {
 		e.preventDefault();
 		if (users[selectedUserIndex].previewContent.trim() === "") return;
+
+		//deep copying pending message
+		setPendingMessages((prevMessages) => {
+			let copyPrevMessages = [...prevMessages];
+			for (let i = 0; i < copyPrevMessages.length; i++) {
+				copyPrevMessages[i] = { ...copyPrevMessages[i] };
+			}
+			let newPendingMessageObject = {
+				from: user.username,
+				to: selectedUser.username,
+				content: users[selectedUserIndex].previewContent,
+				reactions: [],
+				pendingID: Date.now(),
+			};
+			copyPrevMessages.push(newPendingMessageObject);
+
+			return copyPrevMessages;
+		});
+
 		messageDispath({
 			type: "CLEAR_PREVIEWCONTENT",
 			payload: {
@@ -107,10 +147,12 @@ function MessageSection({
 				previewContent: users[selectedUserIndex].previewContent,
 			},
 		});
+
 		sendMessage({
 			variables: {
 				to: selectedUser.username,
 				content: users[selectedUserIndex].previewContent,
+				pendingID: "" + Date.now(),
 			},
 		});
 	};
@@ -163,6 +205,35 @@ function MessageSection({
 		}
 	};
 
+	const messageRetryHandler = (message) => {
+		console.log("MESSAGE:", message);
+		const {
+			to: messageTo,
+			content: messageContent,
+			pendingID: messagePendingID,
+		} = message;
+		let copyPendingMessages = [...pendingMessages];
+		const copyPendingMessageIndex = copyPendingMessages.findIndex((m) => {
+			console.log(m.pendingID, messagePendingID);
+			return m.pendingID === messagePendingID;
+		});
+		console.log(copyPendingMessages[copyPendingMessageIndex]);
+		console.log(copyPendingMessageIndex);
+		copyPendingMessages.splice(copyPendingMessageIndex, 1);
+
+		copyPendingMessages.push(message);
+		console.log(copyPendingMessages);
+		setPendingMessages(copyPendingMessages);
+
+		sendMessage({
+			variables: {
+				to: messageTo,
+				content: messageContent,
+				pendingID: "" + Date.now(),
+			},
+		});
+	};
+
 	return (
 		<div className={classes.MessageSection}>
 			{messagesLoading ? (
@@ -183,6 +254,23 @@ function MessageSection({
 								</div>
 							</div>
 						)}
+						{/* Pending messages and failed messages area */}
+						{showRetry && (
+							<div>
+								{failedMessages?.map((m) => {
+									return (
+										<Message
+											messageRetryHandler={messageRetryHandler}
+											noShow={selectedUser.username !== m.to}
+											key={m.pendingID}
+											pending
+											showRetry={showRetry}
+											message={m}
+										/>
+									);
+								})}
+							</div>
+						)}
 
 						{messagesData?.length > 0 ? (
 							messagesData.map((message, index) => (
@@ -194,7 +282,6 @@ function MessageSection({
 										<hr style={{ margin: "0", color: "white" }} />
 									</div>
 								)} */}
-
 									{(index === messagesData.length - 1 ||
 										(messagesData[index + 1] &&
 											(new Date(message.createdAt) -
@@ -238,78 +325,76 @@ function MessageSection({
 						<EmojiPicker pickEmoji={onEmojiClick} />
 					</Popover>
 					{/* )} */}
-
-					
 				</>
 			)}
 			<div className={classes.sendAreaContainer}>
-						<div className={classes.sendArea}>
-							<div className={classes.facility}>
-								{
-									<MaterialTooltip title='Attach a photo or video'>
-										<IconButton className={classes.sendAreaIcons}>
-											<ImageIcon />
-										</IconButton>
-									</MaterialTooltip>
-								}
-								<MaterialTooltip title='Choose an emoji'>
-									<IconButton
-										onClick={(e) => emojiHandler(e)}
-										className={classes.sendAreaIcons}>
-										<EmojiEmotionsIcon />
-									</IconButton>
-								</MaterialTooltip>
-							</div>
-							<div
-								// style={{
-								// 	marginRight: !textAreaFocused ? "10px" : "0",
-								// }}
-								style={{ marginRight: "20px" }}
-								className={classes.textArea}>
-								{users && users[selectedUserIndex] && (
-									<form onSubmit={submitMessageHandler}>
-										<InputBase
-											onKeyDown={handleKeyDown}
-											className={classes.textInputBase}
-											multiline
-											ref={inputRef}
-											type='text'
-											placeholder='Aa'
-											// onFocus={() => setTextAreaFocused(true)}
-											// onBlur={() => setTextAreaFocused(false)}
-											value={users[selectedUserIndex].previewContent}
-											onChange={(e) => {
-												messageDispath({
-													type: "SET_PREVIEWCONTENT",
-													payload: {
-														selectedUser,
-														previewContent: e.target.value,
-													},
-												});
-												callTypingIndicator();
-											}}
-										/>
-									</form>
-								)}
-							</div>
-
-							{
-								<div className={classes.sendButton}>
-									<MaterialTooltip title='Send the message'>
-										<IconButton
-											ref={submitRef}
-											onClick={submitMessageHandler}
-											className={[classes.sendAreaIcons, classes.sendIcon].join(
-												" "
-											)}>
-											<SendIcon />
-										</IconButton>
-									</MaterialTooltip>
-								</div>
-							}
-						</div>
+				<div className={classes.sendArea}>
+					<div className={classes.facility}>
+						{
+							<MaterialTooltip title='Attach a photo or video'>
+								<IconButton className={classes.sendAreaIcons}>
+									<ImageIcon />
+								</IconButton>
+							</MaterialTooltip>
+						}
+						<MaterialTooltip title='Choose an emoji'>
+							<IconButton
+								onClick={(e) => emojiHandler(e)}
+								className={classes.sendAreaIcons}>
+								<EmojiEmotionsIcon />
+							</IconButton>
+						</MaterialTooltip>
 					</div>
-					<div className={classes.fillArea}></div>
+					<div
+						// style={{
+						// 	marginRight: !textAreaFocused ? "10px" : "0",
+						// }}
+						style={{ marginRight: "20px" }}
+						className={classes.textArea}>
+						{users && users[selectedUserIndex] && (
+							<form onSubmit={submitMessageHandler}>
+								<InputBase
+									onKeyDown={handleKeyDown}
+									className={classes.textInputBase}
+									multiline
+									ref={inputRef}
+									type='text'
+									placeholder='Aa'
+									// onFocus={() => setTextAreaFocused(true)}
+									// onBlur={() => setTextAreaFocused(false)}
+									value={users[selectedUserIndex].previewContent}
+									onChange={(e) => {
+										messageDispath({
+											type: "SET_PREVIEWCONTENT",
+											payload: {
+												selectedUser,
+												previewContent: e.target.value,
+											},
+										});
+										callTypingIndicator();
+									}}
+								/>
+							</form>
+						)}
+					</div>
+
+					{
+						<div className={classes.sendButton}>
+							<MaterialTooltip title='Send the message'>
+								<IconButton
+									ref={submitRef}
+									onClick={submitMessageHandler}
+									className={[classes.sendAreaIcons, classes.sendIcon].join(
+										" "
+									)}>
+									<SendIcon />
+								</IconButton>
+							</MaterialTooltip>
+						</div>
+					}
+				</div>
+			</div>
+			<div className={classes.fillArea}></div>
 		</div>
 	);
 }

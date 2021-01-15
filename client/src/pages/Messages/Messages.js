@@ -196,12 +196,14 @@ function Messages() {
 					<div
 						style={{
 							width: "100%",
-							height: "40vh",
+							height: "100vh",
 							justifyContent: "center",
-							alignItems: "center",
+							// alignItems: "center",
 							display: "flex",
 						}}>
-						<ErrorComponent alwaysDisplay />
+						<div style={{ marginTop: "200px" }}>
+							<ErrorComponent alwaysDisplay />
+						</div>
 					</div>
 				) : (
 					// styling the getUsers section like messenger

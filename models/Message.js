@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
+			pendingID: {
+				type: DataTypes.BIGINT,
+				allowNull: false,
+			},
 		},
 		{
 			sequelize,

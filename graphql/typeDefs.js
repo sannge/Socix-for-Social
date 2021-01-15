@@ -18,6 +18,7 @@ module.exports = gql`
 		to: String!
 		createdAt: String!
 		reactions: [Reaction]
+		pendingID: String
 	}
 
 	type Reaction {
@@ -46,7 +47,7 @@ module.exports = gql`
 			password: String!
 			confirmPassword: String!
 		): User!
-		sendMessage(to: String!, content: String!): Message!
+		sendMessage(to: String!, content: String!, pendingID: String!): Message!
 		reactToMessage(uuid: String!, content: String!): Reaction!
 		userTyping(from: String!, to: String!): Boolean
 	}

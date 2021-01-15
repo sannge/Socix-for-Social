@@ -50,7 +50,7 @@ module.exports = {
 	},
 
 	Mutation: {
-		sendMessage: async (_, { to, content }, { user, pubsub }) => {
+		sendMessage: async (_, { to, content, pendingID }, { user, pubsub }) => {
 			try {
 				if (!user) throw new AuthenticationError("Unauthenticated");
 
@@ -71,6 +71,7 @@ module.exports = {
 					from: user.username,
 					to,
 					content,
+					pendingID,
 				});
 
 				pubsub.publish("NEW_MESSAGE", { newMessage: message });
