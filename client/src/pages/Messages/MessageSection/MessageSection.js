@@ -75,9 +75,7 @@ function MessageSection({
 				const sentMessageIndex = copyPendingMessages.findIndex(
 					(m) => m.pendingID === sentMessage.pendingID
 				);
-				console.log(copyPendingMessages);
 				copyPendingMessages.splice(sentMessageIndex, 1);
-				console.log(copyPendingMessages);
 				setPendingMessages(copyPendingMessages);
 			},
 		}
@@ -206,7 +204,6 @@ function MessageSection({
 	};
 
 	const messageRetryHandler = (message) => {
-		console.log("MESSAGE:", message);
 		const {
 			to: messageTo,
 			content: messageContent,
@@ -214,16 +211,25 @@ function MessageSection({
 		} = message;
 		let copyPendingMessages = [...pendingMessages];
 		const copyPendingMessageIndex = copyPendingMessages.findIndex((m) => {
-			console.log(m.pendingID, messagePendingID);
 			return m.pendingID === messagePendingID;
 		});
-		console.log(copyPendingMessages[copyPendingMessageIndex]);
-		console.log(copyPendingMessageIndex);
+
 		copyPendingMessages.splice(copyPendingMessageIndex, 1);
 
+		//set the fail message without the last pending message
+		let copyOfCopyPendingMessages = [...copyPendingMessages];
+		for (let i = 0; i < copyOfCopyPendingMessages.length; i++) {
+			copyOfCopyPendingMessages[i] = { ...copyOfCopyPendingMessages[i] };
+		}
+		setFailedMessages(copyOfCopyPendingMessages);
+
 		copyPendingMessages.push(message);
-		console.log(copyPendingMessages);
-		setPendingMessages(copyPendingMessages);
+		//for pending messages, that will also include the last message
+		let copyOfCopyPendingMessages2 = [...copyPendingMessages];
+		for (let i = 0; i < copyOfCopyPendingMessages2.length; i++) {
+			copyOfCopyPendingMessages2[i] = { ...copyOfCopyPendingMessages2[i] };
+		}
+		setPendingMessages(copyOfCopyPendingMessages2);
 
 		sendMessage({
 			variables: {
@@ -260,6 +266,7 @@ function MessageSection({
 								{failedMessages?.map((m) => {
 									return (
 										<Message
+											ref={lastMessageRef}
 											messageRetryHandler={messageRetryHandler}
 											noShow={selectedUser.username !== m.to}
 											key={m.pendingID}
