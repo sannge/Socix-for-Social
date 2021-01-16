@@ -11,6 +11,7 @@ const messageReducer = (state, action) => {
 		messages,
 		reaction,
 		previewContent,
+		pendingID
 	} = action.payload;
 
 	switch (action.type) {
@@ -149,7 +150,54 @@ const messageReducer = (state, action) => {
 					users: usersCopy,
 				};
 			}
-			break;
+		}
+
+		case "SET_PENDING_MESSAGE": {
+			const copyPendingMessages = [...state.pendingMessages];
+
+			for (let i = 0; i < copyPendingMessages.length; i++) {
+				copyPendingMessages[i] = { ...copyPendingMessages[i] };
+			}
+
+			let newPendingMessageObject = {
+				from: username,
+				to: state.selectedUser.username,
+				content: message,
+				reactions: [],
+				pendingID,
+			};
+
+			copyPendingMessages.push(newPendingMessageObject);
+			
+			return {
+				...state,
+				pendingMessages: copyPendingMessages
+			}
+		
+		}
+
+		case "REMOVE_PENDING_MESSAGE": {
+			const sentMessage = { ...message };
+
+				let copyPendingMessages = [...state.pendingMessages];
+
+				const sentMessageIndex = copyPendingMessages.findIndex(
+					(m) => m.pendingID === sentMessage.pendingID
+				);
+				copyPendingMessages.splice(sentMessageIndex, 1);
+				
+				return {
+					...state,
+					pendingMessages: copyPendingMessages,
+				}
+		}
+
+		case "SET_PENDING_MESSAGES": {
+			//for pending messages, that will also include the last message
+			return {
+				...state,
+				pendingMessages: messages,
+			}
 		}
 
 		default:
@@ -161,6 +209,7 @@ export const MessageProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(messageReducer, {
 		selectedUser: null,
 		users: null,
+		pendingMessages: []
 	});
 	return (
 		<MessageDispatchContext.Provider value={dispatch}>

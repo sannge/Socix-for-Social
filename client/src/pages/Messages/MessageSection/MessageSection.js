@@ -30,15 +30,13 @@ function MessageSection({
 
 	const [cur, setCur] = useState(0);
 
-	const [pendingMessages, setPendingMessages] = useState([]);
-	const [showRetry, setShowRetry] = useState(false);
 	const [failedMessages, setFailedMessages] = useState([]);
 
 	const open = Boolean(anchorEl);
 
 	const classes = useStyles();
 
-	const { users, selectedUser } = useMessageState();
+	const { users, selectedUser, pendingMessages } = useMessageState();
 
 	const selectedUserIndex = users?.findIndex(
 		(u) => u.username === selectedUser?.username
@@ -59,24 +57,21 @@ function MessageSection({
 		{
 			onError: (err) => {
 				console.log(err);
+				//set the failedMessages on error by copying the array from pending messages.
 				const copyPendingMessages = [...pendingMessages];
 				for (let i = 0; i < copyPendingMessages.length; i++) {
 					copyPendingMessages[i] = { ...copyPendingMessages[i] };
 				}
 				setFailedMessages(copyPendingMessages);
-				setShowRetry(true);
 			},
 			//Add a unique id like Date.now() or something so that we can match those two and delete the one from pending
 			onCompleted: (data) => {
-				const sentMessage = { ...data.sendMessage };
-
-				let copyPendingMessages = [...pendingMessages];
-
-				const sentMessageIndex = copyPendingMessages.findIndex(
-					(m) => m.pendingID === sentMessage.pendingID
-				);
-				copyPendingMessages.splice(sentMessageIndex, 1);
-				setPendingMessages(copyPendingMessages);
+				messageDispath({
+					type: "REMOVE_PENDING_MESSAGE",
+					payload: {
+						message: data.sendMessage,
+					},
+				});
 			},
 		}
 	);
@@ -121,21 +116,14 @@ function MessageSection({
 		if (users[selectedUserIndex].previewContent.trim() === "") return;
 
 		//deep copying pending message
-		setPendingMessages((prevMessages) => {
-			let copyPrevMessages = [...prevMessages];
-			for (let i = 0; i < copyPrevMessages.length; i++) {
-				copyPrevMessages[i] = { ...copyPrevMessages[i] };
-			}
-			let newPendingMessageObject = {
-				from: user.username,
-				to: selectedUser.username,
-				content: users[selectedUserIndex].previewContent,
-				reactions: [],
-				pendingID: Date.now(),
-			};
-			copyPrevMessages.push(newPendingMessageObject);
-
-			return copyPrevMessages;
+		const pendingID = Date.now();
+		messageDispath({
+			type: "SET_PENDING_MESSAGE",
+			payload: {
+				username: user.username,
+				message: users[selectedUserIndex].previewContent,
+				pendingID: "" + pendingID,
+			},
 		});
 
 		messageDispath({
@@ -150,7 +138,7 @@ function MessageSection({
 			variables: {
 				to: selectedUser.username,
 				content: users[selectedUserIndex].previewContent,
-				pendingID: "" + Date.now(),
+				pendingID: "" + pendingID,
 			},
 		});
 	};
@@ -203,13 +191,26 @@ function MessageSection({
 		}
 	};
 
+	//setting error messages when component mount again
+	useEffect(() => {
+		if (pendingMessages) {
+			const copyPendingMessages = [...pendingMessages];
+			for (let i = 0; i < copyPendingMessages.length; i++) {
+				copyPendingMessages[i] = { ...copyPendingMessages[i] };
+			}
+			setFailedMessages(copyPendingMessages);
+		}
+	}, []);
+
 	const messageRetryHandler = (message) => {
 		const {
 			to: messageTo,
 			content: messageContent,
 			pendingID: messagePendingID,
 		} = message;
+
 		let copyPendingMessages = [...pendingMessages];
+
 		const copyPendingMessageIndex = copyPendingMessages.findIndex((m) => {
 			return m.pendingID === messagePendingID;
 		});
@@ -229,7 +230,13 @@ function MessageSection({
 		for (let i = 0; i < copyOfCopyPendingMessages2.length; i++) {
 			copyOfCopyPendingMessages2[i] = { ...copyOfCopyPendingMessages2[i] };
 		}
-		setPendingMessages(copyOfCopyPendingMessages2);
+		// setPendingMessages(copyOfCopyPendingMessages2);
+		messageDispath({
+			type: "SET_PENDING_MESSAGES",
+			payload: {
+				messages: copyOfCopyPendingMessages2,
+			},
+		});
 
 		sendMessage({
 			variables: {
@@ -261,7 +268,7 @@ function MessageSection({
 							</div>
 						)}
 						{/* Pending messages and failed messages area */}
-						{showRetry && (
+						{failedMessages && (
 							<div>
 								{failedMessages?.map((m) => {
 									return (
@@ -271,7 +278,7 @@ function MessageSection({
 											noShow={selectedUser.username !== m.to}
 											key={m.pendingID}
 											pending
-											showRetry={showRetry}
+											showRetry={failedMessages}
 											message={m}
 										/>
 									);
