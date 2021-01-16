@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
 	GET_USERS,
 	GET_MESSAGES,
-	NEW_MESSAGE,
 	USER_TYPING,
 	USER_TYPING_SUB,
 	NEW_REACTION,
@@ -23,15 +22,13 @@ import MessageSection from "./MessageSection/MessageSection";
 import { useMessageDispatch, useMessageState } from "../../context/message";
 import { useAuthState } from "../../context/auth";
 
-function Messages() {
+function Messages({ showTyping, setShowTyping, newMessageData }) {
 	const messageDispatch = useMessageDispatch();
 	const { users, selectedUser } = useMessageState();
 
 	const selectedUserIndex = users?.findIndex(
 		(u) => u.username === selectedUser?.username
 	);
-
-	const [showTyping, setShowTyping] = useState(false);
 
 	const { user } = useAuthState();
 
@@ -54,13 +51,17 @@ function Messages() {
 
 	const [, setShowLatestMessage] = useState(window.innerWidth >= 960);
 
-	const { data: newMessageData, error: newMessageError } = useSubscription(
-		NEW_MESSAGE
-	);
+	/***
+	 * Moved to App.js to track real time data from other routes
+	 */
 
-	const { data: reactionData, error: reactionError } = useSubscription(
-		NEW_REACTION
-	);
+	// const { data: newMessageData, error: newMessageError } = useSubscription(
+	// 	NEW_MESSAGE
+	// );
+
+	// const { data: reactionData, error: reactionError } = useSubscription(
+	// 	NEW_REACTION
+	// );
 
 	const [userTyping] = useMutation(USER_TYPING, {
 		onError: (error) => console.log(error),
@@ -68,45 +69,45 @@ function Messages() {
 
 	const { data: typing, error: typingError } = useSubscription(USER_TYPING_SUB);
 
-	useEffect(() => {
-		if (reactionError) {
-			console.log(reactionError);
-		} else if (reactionData) {
-			console.log("reactionData: ", reactionData.newReaction);
-			const reaction = reactionData.newReaction;
-			const otherUser =
-				user.username === reaction.message.to
-					? reaction.message.from
-					: reaction.message.to;
-			messageDispatch({
-				type: "ADD_REACTION",
-				payload: { username: otherUser, reaction },
-			});
-		}
-	}, [reactionError, reactionData]);
+	// useEffect(() => {
+	// 	if (reactionError) {
+	// 		console.log(reactionError);
+	// 	} else if (reactionData) {
+	// 		console.log("reactionData: ", reactionData.newReaction);
+	// 		const reaction = reactionData.newReaction;
+	// 		const otherUser =
+	// 			user.username === reaction.message.to
+	// 				? reaction.message.from
+	// 				: reaction.message.to;
+	// 		messageDispatch({
+	// 			type: "ADD_REACTION",
+	// 			payload: { username: otherUser, reaction },
+	// 		});
+	// 	}
+	// }, [reactionError, reactionData]);
 
-	useEffect(() => {
-		if (newMessageError) {
-			console.log(newMessageError);
-		}
-		if (newMessageData) {
-			if (newMessageData.newMessage.from === selectedUser?.username) {
-				setShowTyping(false);
-			}
-			console.log("newMessageData: ", newMessageData.newMessage.content);
-			const otherUser =
-				user.username === newMessageData.newMessage.to
-					? newMessageData.newMessage.from
-					: newMessageData.newMessage.to;
-			messageDispatch({
-				type: "ADD_MESSAGE",
-				payload: {
-					username: otherUser,
-					message: newMessageData.newMessage,
-				},
-			});
-		}
-	}, [newMessageData, newMessageError]);
+	// useEffect(() => {
+	// 	if (newMessageError) {
+	// 		console.log(newMessageError);
+	// 	}
+	// 	if (newMessageData) {
+	// 		if (newMessageData.newMessage.from === selectedUser?.username) {
+	// 			setShowTyping(false);
+	// 		}
+	// 		console.log("newMessageData: ", newMessageData.newMessage.content);
+	// 		const otherUser =
+	// 			user.username === newMessageData.newMessage.to
+	// 				? newMessageData.newMessage.from
+	// 				: newMessageData.newMessage.to;
+	// 		messageDispatch({
+	// 			type: "ADD_MESSAGE",
+	// 			payload: {
+	// 				username: otherUser,
+	// 				message: newMessageData.newMessage,
+	// 			},
+	// 		});
+	// 	}
+	// }, [newMessageData, newMessageError]);
 
 	// useEffect(() => {
 	// 	if (users && users[0]) {
